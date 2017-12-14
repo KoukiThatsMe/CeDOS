@@ -1,0 +1,1 @@
+qemu -L .\ -fda build/base.img -m 64 -monitor stdio

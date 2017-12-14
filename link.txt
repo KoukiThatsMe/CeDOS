@@ -1,0 +1,18 @@
+INPUT(build/boot.o)
+OUTPUT_FORMAT(binary)
+OUTPUT_ARCH(i386)
+
+PAGE_SIZE = 1 << 12;
+
+MEMORY
+{
+  BOOT :        ORIGIN = 0x00007C00, LENGTH = 0x00000300
+}
+
+SECTIONS
+{
+  BOOT :
+  {
+    build/boot.o(.text)
+  } >BOOT
+}
