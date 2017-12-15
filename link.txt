@@ -17,7 +17,7 @@ SECTIONS
     build/boot.o(.text)
   } >BOOT
 
-  SECOND_STAGE : AT(ADDR(BOOT) + SIZEOF(BOOT))
+  SECOND_STAGE : AT(LOADADDR(BOOT) + SIZEOF(BOOT))
   {
     build/second_stage.o(.text)
     build/second_stage.o(.data)
