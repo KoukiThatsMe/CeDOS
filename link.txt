@@ -6,13 +6,20 @@ PAGE_SIZE = 1 << 12;
 
 MEMORY
 {
-  BOOT :        ORIGIN = 0x00007C00, LENGTH = 0x00000300
+  BOOT :          ORIGIN = 0x00007C00, LENGTH = 0x00000200
+  SECOND_STAGE :  ORIGIN = 0x00010000, LENGTH = 0x00090000
 }
 
 SECTIONS
 {
-  BOOT :
+  BOOT : AT(0x0000)
   {
     build/boot.o(.text)
   } >BOOT
+
+  SECOND_STAGE : AT(ADDR(BOOT) + SIZEOF(BOOT))
+  {
+    build/second_stage.o(.text)
+    build/second_stage.o(.data)
+  } >SECOND_STAGE
 }

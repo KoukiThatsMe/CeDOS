@@ -20,8 +20,8 @@ start:
   mov %ax, %sp
 
   # select display page 0
-  movb $0, %al
-  movb 0x05, %ah
+  mov $0, %al
+  mov $0x05, %ah
   int $0x10
 
   # print hello world
@@ -37,12 +37,23 @@ print_loop:
   jmp print_loop
 print_end:
 
+  # TODO:
+  # - load kernel into memory starting at adress 0x10000
+  #   (NOTE: this code can only be jumped to after loading the global descriptor table
+  #          because it uses absolute adresses larger than 16 bit)
+  # - load global descriptor table and far jump into protected mode
+  # - activate A20 gate
+  # - jump to low kernel code
+
   # loop forever
+
 loop:
   jmp loop
 
   # some data
-  message: .ascii "Hello World!\n\0"
+message: 
+  .ascii " Hello World!"
+  .byte 0x00
 
 end:
   .=510
