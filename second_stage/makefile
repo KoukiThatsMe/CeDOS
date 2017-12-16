@@ -17,4 +17,4 @@ build/entry.o: entry.s
 > $(GCC_PREFIX)as -o $@ $<
 
 build/gdt.o: gdt.c gdt.h
-> $(GCC_PREFIX)gcc -I$(INCLUDE_DIR) --prefix=$(GCC_PREFIX) $(GCC_OPTIONS) -o $@ $<
+> $(GCC_PREFIX)gcc -c -I$(INCLUDE_DIR) --prefix=$(GCC_PREFIX) $(GCC_OPTIONS) -o $@ $<
