@@ -28,6 +28,9 @@ start:
   movw $message, %si
   call print
 
+  # TODO:
+  # - activate A20 gate
+
   # reset bootdrive
 reset:
   movb $0x00, %ah
@@ -62,9 +65,20 @@ load:
   mov %ax, %ds
   mov %ax, %es
 
-  # TODO:
   # - load global descriptor table and far jump into protected mode
-  # - activate A20 gate
+  lgdt (GDT_DESCRIPTOR)
+
+  mov %cr0, %eax
+  or $1, %eax
+  mov %eax, %cr0
+
+  ljmp $0x8, $protected
+
+.code32
+protected:
+
+
+  # TODO:
   # - jump to second stage code
 
 
@@ -72,6 +86,7 @@ load:
 loop:
   jmp loop
 
+.code16
 
   # ############################################
   # print
@@ -98,6 +113,10 @@ message:
   .byte 13
   .byte 10
   .byte 0
+
+GDT_DESCRIPTOR:
+  .int GDT
+  .word 0x23
 
 end:
   .=510

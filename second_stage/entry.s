@@ -1,8 +1,10 @@
 .section .text
-start:
-# loop:
-#   jmp loop
+.global _start
+_start:
+loop:
+  jmp loop
 
+.section .data
 low_kernel_welcome:
   .ascii "Welcome to the low kernel!"
   .byte 13
