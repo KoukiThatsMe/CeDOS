@@ -55,18 +55,9 @@ load:
   int $0x13
   jnc load
 
-  # prints out string thats loaded into memory at 0x00010000
-  # remove this test later
-  mov $0x1000, %ax
-  mov %ax, %ds
-  mov $0, %si
-  call print
-  xor %ax, %ax
-  mov %ax, %ds
-  mov %ax, %es
-
   # - load global descriptor table and far jump into protected mode
   lgdt (GDT_DESCRIPTOR)
+  lidt (IDT_DESCRIPTOR)
 
   mov %cr0, %eax
   or $1, %eax
@@ -76,15 +67,15 @@ load:
 
 .code32
 protected:
+  # setup registers with appropriate GDT values
+  mov $0x10, %eax
+  mov %eax, %ds
+  mov %eax, %es
+  mov %eax, %fs
+  mov %eax, %gs
 
-
-  # TODO:
-  # - jump to second stage code
-
-
-  # loop forever
-loop:
-  jmp loop
+  # jump to second stage code
+  ljmp $0x08, $_ss_start
 
 .code16
 
@@ -115,8 +106,12 @@ message:
   .byte 0
 
 GDT_DESCRIPTOR:
-  .int GDT
   .word 0x23
+  .int GDT
+
+IDT_DESCRIPTOR:
+  .word 0
+  .int 0
 
 end:
   .=510
