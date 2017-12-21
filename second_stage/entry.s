@@ -18,6 +18,8 @@ test:
 
   # TODO:
   #  - copy the kernel code to 0x00100000
+  call copy_kernel
+
   #  - create a page directory for the kernel that maps it to 0xC0000000
   #    and identity maps the first 1M of memory
   #  - enable paging

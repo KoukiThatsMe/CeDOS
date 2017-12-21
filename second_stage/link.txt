@@ -1,4 +1,4 @@
-INPUT(build/entry.o build/gdt.o)
+INPUT(build/entry.o build/gdt.o build/main.o)
 OUTPUT_FORMAT(elf32-i386)
 OUTPUT_ARCH(i386)
 ENTRY(_ss_start)
@@ -9,11 +9,13 @@ SECTIONS
   {
       build/entry.o(.text)
       build/gdt.o(.text)
+      build/main.o(.text)
   }
 
   .data :
   {
       build/entry.o(.data)
       build/gdt.o(.data)
+      build/main.o(.data)
   }
 }

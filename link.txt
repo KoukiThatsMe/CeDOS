@@ -8,18 +8,31 @@ MEMORY
 {
   BOOT :          ORIGIN = 0x00007C00, LENGTH = 0x00000200
   SECOND_STAGE :  ORIGIN = 0x00010000, LENGTH = 0x00090000
+  KERNEL :        ORIGIN = 0xC0000000, LENGTH = 0x30000000
 }
 
 SECTIONS
 {
   BOOT : AT(0x0000)
   {
-    build/boot.o(.text)
+    build/boot.o(.*)
   } >BOOT
 
   SECOND_STAGE : AT(LOADADDR(BOOT) + SIZEOF(BOOT))
   {
-    build/second_stage.o(.text)
-    build/second_stage.o(.data)
+    build/second_stage.o(.*)
   } >SECOND_STAGE
+
+  KERNEL : AT(LOADADDR(SECOND_STAGE) + SIZEOF(SECOND_STAGE))
+  {
+
+  } >KERNEL
 }
+
+__SS_LMA = LOADADDR(SECOND_STAGE);
+__SS_VMA = ADDR(SECOND_STAGE);
+__SS_SIZE = SIZEOF(SECOND_STAGE);
+
+__KERNEL_LMA = LOADADDR(KERNEL);
+__KERNEL_VMA = ADDR(KERNEL);
+__KERNEL_SIZE = SIZEOF(KERNEL);
