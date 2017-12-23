@@ -1,1 +1,1 @@
-qemu -L .\ -fda build/base.img -m 64 -monitor stdio -no-reboot -d int,cpu_reset 2> debug/err.log
+qemu -drive index=0,if=floppy,format=raw,file=build/base.img -m 64 -monitor stdio -no-reboot -d int,cpu_reset 2> debug/err.log
