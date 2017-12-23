@@ -24,7 +24,7 @@ void *create_kernel_environment() {
 
 
     for (uint32_t i = 0; i < 1 << 8; i++) {
-        (*kernel)[i].entry = MAKE_PAGE_ENTRY(KERNEL_LMA + PAGE_SIZE * i, 0b000000000011);
+        (*kernel)[i].entry = MAKE_PAGE_ENTRY(0x100000 + PAGE_SIZE * i, 0b000000000011);
     }
 
     // identity map first 4M of memory
