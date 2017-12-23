@@ -73,6 +73,7 @@ protected:
   mov %eax, %es
   mov %eax, %fs
   mov %eax, %gs
+  mov %eax, %ss
 
   # jump to second stage code
   ljmp $0x08, $_ss_start
@@ -112,8 +113,3 @@ GDT_DESCRIPTOR:
 IDT_DESCRIPTOR:
   .word 0
   .int 0
-
-end:
-  .=510
-  .byte 0x55
-  .byte 0xAA

@@ -1,20 +1,37 @@
 #include "linker.h"
+#include "paging.h"
 
+#define VGA_TEXTMODE_COLUMNS 80
+#define VGA_TEXTMODE_LINES 25
+#define VGA_TEXTMODE_CELLS (VGA_TEXTMODE_COLUMNS * VGA_TEXTMODE_LINES)
+
+#define VGA_TEXT_COLOR 0x02
+
+const uint8_t const *display_start = (uint8_t*)0xB8000;
 uint8_t *display = (uint8_t*)0xB8000;
 
 void simple_clear(void) {
-    display = (uint8_t*)0xB8000;
+    display = (uint8_t*)display_start;
 
-    for (int i = 0; i < 80 * 25; i++) {
+    for (int i = 0; i < VGA_TEXTMODE_CELLS; i++) {
         display[2 * i] = 0x00;
         display[2 * i + 1] = 0x00;
     }
 }
 
-void simple_print(const char* src) {
+void simple_print(const char *src) {
     while (*src) {
         *display++ = *src++;
-        *display++ = 0x02;
+        *display++ = VGA_TEXT_COLOR;
+    }
+}
+
+void simple_println(const char *src) {
+    simple_print(src);
+
+    while ((display - display_start) % (2 * VGA_TEXTMODE_COLUMNS)) {
+        display++;
+        display++;
     }
 }
 
@@ -29,5 +46,5 @@ void copy_kernel(void) {
         kernel_dest[i] = kernel_src[i];
     }
 
-    simple_print("DONE.");
+    simple_println("DONE.");
 }

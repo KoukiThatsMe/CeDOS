@@ -1,1 +1,1 @@
-qemu -L .\ -fda build/base.img -m 64 -monitor stdio -no-reboot -d int,cpu_reset
+qemu -L .\ -fda build/base.img -m 64 -monitor stdio -no-reboot -d int,cpu_reset 2> debug/err.log

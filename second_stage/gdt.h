@@ -14,7 +14,7 @@ typedef struct {
     uint8_t base_24;
 } __attribute__((packed)) GDT_ENTRY;
 
-GDT_ENTRY GDT[3];
+GDT_ENTRY GDT[5];
 
 /*struct {
     uint32_t gdt_offset;

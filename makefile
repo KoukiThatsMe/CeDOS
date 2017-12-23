@@ -14,6 +14,7 @@ export GCC_OPTIONS		= -O0 -Wno-write-strings -Wall -Wextra -fno-exceptions -nost
 build:
 > $(MAKE) -C boot build
 > $(MAKE) -C second_stage build
+> $(MAKE) -C kernel build
 > $(GCC_PREFIX)ld -T link.txt -Map=$(DEBUG_DIR)/mapfile.txt -o $(BUILD_DIR)/base.img --oformat binary
 
 .PHONY: clear
@@ -21,6 +22,7 @@ clear:
 > @rm $(BUILD_DIR)/*.* 2> /dev/null; true
 > @$(MAKE) -C boot clear 2> /dev/null; true
 > @$(MAKE) -C second_stage clear 2> /dev/null; true
+> @$(MAKE) -C kernel clear 2> /dev/null; true
 
 .PHONY: run
 run:
@@ -30,3 +32,7 @@ run:
 rebuild:
 > $(MAKE) clear
 > $(MAKE) build
+
+.PHONY: objdump
+objdump:
+> $(GCC_PREFIX)objdump -D $(FILE) > debug/objdump.txt
