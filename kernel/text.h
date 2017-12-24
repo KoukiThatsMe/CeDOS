@@ -7,5 +7,6 @@ void write_n(const char *string, uint32_t num);
 void write(const char *string);
 
 void clear();
+void backspace(void);
 
 #endif
