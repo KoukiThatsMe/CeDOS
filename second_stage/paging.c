@@ -1,5 +1,6 @@
 #include "paging.h"
 #include "linker.h"
+#include "kernel.h"
 
 void *ss_memset(void *ptr, uint8_t value, uint32_t num) {
     for (uint32_t i = 0; i < num; i++) {
@@ -17,11 +18,10 @@ void *create_kernel_environment() {
     ss_memset(pdir, 0, 3 * PAGE_SIZE);
 
     // map page directory to itself
-    //(*pdir)[PAGE_DIR_INDEX(0)].entry = MAKE_PAGE_ENTRY(pdir, 0b000000000011);
+    (*pdir)[PAGE_DIR_INDEX(PAGE_ENTRY_COUNT - 1)].entry = MAKE_PAGE_ENTRY(pdir, 0b000000000011);
 
     // map kernel to 0xC0000000
     (*pdir)[PAGE_DIR_INDEX(KERNEL_VMA)].entry = MAKE_PAGE_ENTRY(kernel, 0b000000000011);
-
 
     for (uint32_t i = 0; i < 1 << 8; i++) {
         (*kernel)[i].entry = MAKE_PAGE_ENTRY(0x100000 + PAGE_SIZE * i, 0b000000000011);
@@ -33,6 +33,8 @@ void *create_kernel_environment() {
     for (uint32_t i = 0; i < 1 << 10; i++) {
         (*lowmem)[i].entry = MAKE_PAGE_ENTRY(PAGE_SIZE * i, 0b000000000011);
     }
+
+    // map 
 
     return pdir;
 }

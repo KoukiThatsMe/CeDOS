@@ -2,7 +2,7 @@
 
 .PHONY: build
 build: build/entry.o build/gdt.o build/main.o build/paging.o
-> $(GCC_PREFIX)ld -r -T link.txt -o $(BUILD_DIR)/second_stage.o --oformat elf32-i386
+> $(GCC_PREFIX)ld $^ -r -T link.txt -o $(BUILD_DIR)/second_stage.o --oformat elf32-i386
 
 .PHONY: clear
 clear:

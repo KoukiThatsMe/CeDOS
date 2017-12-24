@@ -16,7 +16,6 @@ _ss_start:
   or $0x80000010, %eax
   movl %eax, %cr0
 
-  # TODO:
   # jump to kernel code
   ljmp $8, $__KERNEL_VMA
 
