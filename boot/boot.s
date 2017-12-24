@@ -31,6 +31,8 @@ start:
 reset:
   movw $reset_msg, %si
   call print
+  movw $bootdrive_msg, %si
+  call print
 
   movb $0x00, %ah
   int $0x13
@@ -71,6 +73,9 @@ load:
 
   movw $done_msg, %si
   call print
+
+DEBUG:
+  jmp DEBUG
 
   lidt (IDT_DESCRIPTOR)
 
@@ -119,11 +124,14 @@ print_end:
   ret
 
 reset_msg: 
-  .ascii "Resetting bootdrive..."
+  .ascii "Resett"
   .byte 0
 
 load_msg: 
-  .ascii "Loading bootdrive..."
+  .ascii "Load"
+
+bootdrive_msg:
+  .ascii "ing bootdrive..."
   .byte 0
 
 gdt_msg:
