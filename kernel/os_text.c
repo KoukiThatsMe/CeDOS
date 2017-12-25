@@ -1,13 +1,18 @@
 #include "linker.h"
 #include "assembly.h"
+#include "os_string.h"
 
 #define VGA_TEXTMODE_COLUMNS 80
 #define VGA_TEXTMODE_LINES 25
-#define VGA_TEXTMODE_CELLS (VGA_TEXTMODE_COLUMNS * VGA_TEXTMODE_LINES)
 #define VGA_TEXTMODE_BPC 2
+#define VGA_TEXTMODE_LINE_WIDTH (VGA_TEXTMODE_COLUMNS * VGA_TEXTMODE_BPC)
+#define VGA_TEXTMODE_CELLS (VGA_TEXTMODE_COLUMNS * VGA_TEXTMODE_LINES)
 #define VGA_MEM_POS(line, column) ((line) * VGA_TEXTMODE_COLUMNS * VGA_TEXTMODE_BPC + (column) * VGA_TEXTMODE_BPC)
 
 #define VGA_TEXTMODE_MEM ((uint8_t*)0xB8000)
+#define VGA_MEM_VALUE(line, column) (VGA_TEXTMODE_MEM[VGA_MEM_POS((line), (column))])
+#define VGA_MEM_COLOR(line, column) (VGA_TEXTMODE_MEM[VGA_MEM_POS((line), (column)) + 1])
+#define VGA_MEM_ADDR(line, column) (&(VGA_MEM_VALUE((line), (column))))
 
 #define VGA_INDEX_REG ((uint16_t)0x3D4)
 #define VGA_DATA_REG ((uint16_t)0x3D5)
@@ -17,23 +22,36 @@ uint32_t column = 0;
 uint8_t color = 0x0F;
 
 __attribute((always_inline)) inline void set_char(char value) {
-    VGA_TEXTMODE_MEM[VGA_MEM_POS(line, column)] = value;
-    VGA_TEXTMODE_MEM[VGA_MEM_POS(line, column) + 1] = color;
+    VGA_MEM_VALUE(line, column) = value;
+    VGA_MEM_COLOR(line, column) = color;
 }
 
 __attribute((always_inline)) inline void lfcr() {
-    if (line < VGA_TEXTMODE_LINES) {
-        line++;
-    } else {
+    line++;
+    column = 0;
+    
+    if (line >= VGA_TEXTMODE_LINES) {
+        memcpy(
+                VGA_MEM_ADDR(0, 0), 
+                VGA_MEM_ADDR(1, 0), 
+                VGA_TEXTMODE_LINE_WIDTH * (VGA_TEXTMODE_LINES - 1)
+            );
+        memset(
+                VGA_MEM_ADDR(VGA_TEXTMODE_LINES - 1, 0), 
+                0, 
+                VGA_TEXTMODE_LINE_WIDTH
+            );
         line = VGA_TEXTMODE_LINES - 1;
     }
-    column = 0;
 }
 
 __attribute((always_inline)) inline void write_char(char value) {
+    if (column >= VGA_TEXTMODE_COLUMNS  || value == '\n') {
+        lfcr();
+    }
+    
     switch (value) {
         case '\n':
-            lfcr();
             break;
         case '\0':
             break;
@@ -41,10 +59,6 @@ __attribute((always_inline)) inline void write_char(char value) {
             set_char(value);
             column++;
             break;
-    }
-
-    if (column >= VGA_TEXTMODE_COLUMNS) {
-        lfcr();
     }
 }
 

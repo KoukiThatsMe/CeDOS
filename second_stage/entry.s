@@ -22,11 +22,3 @@ _ss_start:
   # loop until the heat death of the universe
 loop:
   jmp loop
-  
-
-.section .data
-low_kernel_welcome:
-  .ascii "Welcome to the low kernel!"
-  .byte 13
-  .byte 10
-  .byte 0
