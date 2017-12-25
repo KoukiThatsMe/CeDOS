@@ -8,10 +8,12 @@ export DEBUG_DIR		= $(CURRENT_DIR)/debug
 export GCC_PREFIX		= $(HOME)/opt/cross/i686-elf-/bin/i686-elf-
 
 ifdef DEBUG
-export GCC_OPTIONS		= -O1 -Wno-write-strings -Qn -Wall -Wextra -fno-exceptions -nostdlib -nostartfiles -ffreestanding
+GCC_OPTIONS		= -D DEBUG -O0 -Wno-write-strings -Qn -Wall -Wextra -fno-exceptions -nostdlib -nostartfiles -ffreestanding
 else
-export GCC_OPTIONS		= -D DEBUG -O0 -Wno-write-strings -Qn -Wall -Wextra -fno-exceptions -nostdlib -nostartfiles -ffreestanding
+GCC_OPTIONS		= -O1 -Wno-write-strings -Qn -Wall -Wextra -fno-exceptions -nostdlib -nostartfiles -ffreestanding
 endif
+
+export GCC_OPTIONS
 
 # OBJ_FILES = $(wildcard obj/asm/*.o) $(wildcard obj/cpp/*.o)
 

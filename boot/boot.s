@@ -24,8 +24,22 @@ start:
   movb $0x05, %ah
   int $0x10
 
+  # check if A20 gate is enabled
+  mov $a20_msg, %si
+  call print
+  call checkA20
+  je disabled
+enabled:
+  call print_done
+  jmp resume
+disabled:
+  call print_fail
+  jmp disabled
+resume:
+
+
   # TODO:
-  # - activate A20 gate
+  #  - activate A20 gate
 
   # reset bootdrive
 reset:
@@ -119,6 +133,48 @@ print_loop:
   jmp print_loop
 print_end:
   ret
+
+print_done:
+  mov $done_msg, %si
+  jmp print
+
+print_fail:
+  mov $fail_msg, %si
+  jmp print
+
+  # ############################################
+  # checkA20
+  #   checks if A20 line is enabled
+  #   equal flag: * clear, if A20 is enabled
+  #               * set, if A20 is disabled
+  # ############################################
+checkA20:
+  push %ds
+  push %es
+  push %si
+  push %di
+
+  mov $0x0000, %ax
+  mov %ax, %ds
+  mov $0xFFFF, %ax
+  mov %ax, %es
+
+  mov $0x7DFE, %si
+  mov $0x7E0E, %di
+
+  movw %ds:(%si), %cx
+  movw %es:(%di), %dx
+  cmp %cx, %dx
+
+  pop %di
+  pop %si
+  pop %es
+  pop %ds
+  ret
+
+a20_msg:
+  .ascii "Enabling A20..."
+  .byte 0
 
 reset_msg: 
   .ascii "Resett"
