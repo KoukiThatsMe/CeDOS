@@ -1,3 +1,6 @@
+/*! \file
+ * Wrapper for symbols defined in the linker.
+ */
 #ifndef LINKER_H
 #define LINKER_H
 

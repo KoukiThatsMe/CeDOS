@@ -1,11 +1,19 @@
+/*! \file
+ * Provides structures and functions to interact with and modify 
+ * page directories and page tables.
+ */
 #ifndef PAGING_H
 #define PAGING_H
 
 #include <stdint.h>
 
+//! Number of entries within a page table/directory.
 #define PAGE_ENTRY_COUNT (1 << 10)
+
+//! Size of a single page or page table/directory.
 #define PAGE_SIZE (1 << 12)
 
+//! Represents a single page entry in a page table.
 typedef union {
     uint32_t entry;
     struct
@@ -21,9 +29,10 @@ typedef union {
         uint32_t __ignored : 1;
         uint32_t available : 3;
         uint32_t page_table_addr : 20;
-    } __attribute((packed)) fields;
+    } __attribute__((packed)) fields;
 } PAGE_DIR_ENTRY;
 
+//! Represents a single page table entry in a page directory.
 typedef union {
     uint32_t entry;
     uint8_t bytes[4];
@@ -39,7 +48,7 @@ typedef union {
         uint32_t global : 1;
         uint32_t available : 3;
         uint32_t page_addr : 20;
-    } __attribute((packed)) fields;
+    } __attribute__((packed)) fields;
 } PAGE_TABLE_ENTRY;
 
 #define MAKE_PAGE_ENTRY(addr, flags) (uint32_t)(((uint32_t)(addr) & 0xFFFFF000) | (flags))

@@ -1,5 +1,6 @@
 build/*
 debug/*
+docs/*
 *.img
 *.o
 *.bin

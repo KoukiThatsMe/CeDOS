@@ -74,9 +74,6 @@ load:
   movw $done_msg, %si
   call print
 
-DEBUG:
-  jmp DEBUG
-
   lidt (IDT_DESCRIPTOR)
 
   mov %cr0, %eax

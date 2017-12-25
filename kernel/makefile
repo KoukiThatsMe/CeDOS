@@ -1,7 +1,11 @@
 .RECIPEPREFIX = >
 
+S_OBJECTS = $(patsubst %.s,build/%.s.o,$(wildcard *.s))
+C_OBJECTS = $(patsubst %.c,build/%.c.o,$(wildcard *.c))
+OBJECTS = $(S_OBJECTS) $(C_OBJECTS)
+
 .PHONY: build
-build: build/entry.o build/text.o build/main.o
+build: $(OBJECTS)
 > $(GCC_PREFIX)ld $^ -r -T link.txt -o $(BUILD_DIR)/kernel.o --oformat elf32-i386
 
 .PHONY: clear
@@ -13,11 +17,8 @@ rebuild:
 > $(MAKE) clear
 > $(MAKE) build
 
-build/entry.o: entry.s
+build/%.s.o: %.s
 > $(GCC_PREFIX)as -o $@ $<
 
-build/text.o: text.c text.h
-> $(GCC_PREFIX)gcc -c -I$(INCLUDE_DIR) --prefix=$(GCC_PREFIX) $(GCC_OPTIONS) -o $@ $<
-
-build/main.o: main.c
+build/%.c.o: %.c $(wildcard *.h)
 > $(GCC_PREFIX)gcc -c -I$(INCLUDE_DIR) --prefix=$(GCC_PREFIX) $(GCC_OPTIONS) -o $@ $<
