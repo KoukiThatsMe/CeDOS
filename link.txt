@@ -1,4 +1,3 @@
-INPUT(build/boot.o)
 OUTPUT_FORMAT(binary)
 OUTPUT_ARCH(i386)
 
@@ -16,7 +15,7 @@ SECTIONS
 {
   BOOT : AT(0x0000)
   {
-    build/boot.o(.*)
+    */boot.o(.*)
     . = 510;
     BYTE(0x55)
     BYTE(0xAA)
@@ -24,12 +23,12 @@ SECTIONS
 
   SECOND_STAGE : AT(LOADADDR(BOOT) + SIZEOF(BOOT))
   {
-    build/second_stage.o(.*)
+    */second_stage.o(.*)
   } >SECOND_STAGE
 
   KERNEL : AT(LOADADDR(SECOND_STAGE) + SIZEOF(SECOND_STAGE))
   {
-    build/kernel.o(.*)
+    */kernel.o(.*)
   } >KERNEL
 
   APPLICATION : AT(LOADADDR(KERNEL) + SIZEOF(KERNEL))
