@@ -1,5 +1,5 @@
 /*! \file
- * Sets up the global descriptor table (GDT).
+ * Configures the global descriptor table (GDT).
  */
 #ifndef GDT_H
 #define GDT_H
