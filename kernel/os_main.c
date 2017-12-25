@@ -1,4 +1,4 @@
-#include "text.h"
+#include "os_text.h"
 
 int main(void) {
     clear();

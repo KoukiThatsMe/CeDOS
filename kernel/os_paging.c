@@ -1,6 +1,6 @@
-#include "paging.h"
+#include "os_paging.h"
 #include "linker.h"
-#include "page_allocator.h"
+#include "os_page_allocator.h"
 
 void* map_first_free(void* page_dir, void* search_start, void* page) {
     return 0;

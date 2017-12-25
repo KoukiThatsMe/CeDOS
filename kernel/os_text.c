@@ -22,7 +22,11 @@ __attribute((always_inline)) inline void set_char(char value) {
 }
 
 __attribute((always_inline)) inline void lfcr() {
-    line++;
+    if (line < VGA_TEXTMODE_LINES) {
+        line++;
+    } else {
+        line = VGA_TEXTMODE_LINES - 1;
+    }
     column = 0;
 }
 
