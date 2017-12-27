@@ -13,23 +13,19 @@
         (uint8_t)(type), \
         (uint16_t)(0xC000) \
     }
-    
-struct interrupt_frame {
 
-};
-
-__attribute__((interrupt)) void default_isr(struct interrupt_frame *frame) {
-    write("interrupt was issued\n");
+__attribute__((interrupt)) volatile void default_isr(INTERRUPT_FRAME *frame) {
+    text_write("interrupt was issued\n");
 }
 
-__attribute__((interrupt)) void breakpoint_isr(struct interrupt_frame *frame) {
-    write("BREAKPOINT WAS HIT\n");
+__attribute__((interrupt)) volatile void breakpoint_isr(INTERRUPT_FRAME *frame) {
+    text_write("BREAKPOINT WAS HIT\n");
     // dump registers to stdout
 }
 
-__attribute__((interrupt)) void double_fault_isr(struct interrupt_frame *frame) {
-    write("CRITICAL: DOUBLE FAULT\n");
-    while (1) {}
+__attribute__((interrupt)) volatile void double_fault_isr(INTERRUPT_FRAME *frame) {
+    text_write("CRITICAL: DOUBLE FAULT\n");
+    //while (1) {}
 }
 
 IDT_ENTRY IDT[31];
@@ -51,16 +47,18 @@ struct {
     IDT
 };
 
-void init_interrupts(void) {
+void interrupts_init(void) {
     for (uint32_t i = 0; i < array_sizeof(IDT); i++) {
         switch (i) {
             case 0x03:
             install_interrupt(i, breakpoint_isr, 0x08, HARDWARE_INTERRUPT);
+            break;
             case 0x08:
             install_interrupt(i, double_fault_isr, 0x08, HARDWARE_INTERRUPT);
             break;
             default:
             install_interrupt(i, default_isr, 0x08, HARDWARE_INTERRUPT);
+            break;
         }
     }
 

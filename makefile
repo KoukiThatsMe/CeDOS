@@ -17,6 +17,8 @@ endif
 export GLOBAL_BUILD
 export GCC_OPTIONS
 
+export LOCAL_BUILD = $(GLOBAL_BUILD)
+
 .PHONY: build
 build:
 > @mkdir $(GLOBAL_BUILD) 2> /dev/null; true

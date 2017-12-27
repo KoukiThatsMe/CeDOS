@@ -1,26 +1,19 @@
 #include "os_text.h"
 #include "os_interrupts.h"
+#include "os_pic.h"
 
-int main(void) {
-    init_interrupts();
+int os_init(void) {
+    pic_init();
     
-    const char* string[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
-    clear();
-    for (int i = 0; i < 50; i++) {
-        write("LINE ");
-        write(string[i / 10]);
-        write(string[i % 10]);
-        write("\n");
-    }
+    interrupts_init();
+    
+    text_init();
+}
 
-    write(  "SOMEBODY ONCE TOLD ME "
-            "THE WORLD IS GONNA ROLL ME "
-            "I AINT THE SHARPEST TOOL IN THE SHED "
-            "SHE WAS LOOKING KINDA DUMB "
-            "WITH HER FINGER AND HER THUMB "
-            "IN THE SHAPE OF AN L ON HER FOREHEAD"
-        );
-    //backspace();
+int os_main(void) {
+    const char* string[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
+
+    text_write("Hallo! :)");
 
     return 0;
 }

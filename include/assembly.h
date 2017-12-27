@@ -12,7 +12,7 @@
  * \param port The destination port.
  */
 __attribute((always_inline)) inline void outb(uint8_t msg, uint16_t port) {
-    __asm__ volatile ("outb %0, %1" : "=a" (msg), "=Nd" (port));
+    __asm__ volatile ("outb %0, %1" : : "a" (msg), "Nd" (port));
 }
 
 /*!
@@ -25,5 +25,17 @@ __attribute((always_inline)) inline uint8_t inb(uint16_t port) {
     __asm__ volatile ("inb %1, %0" : "=a" (msg) : "Nd" (port));
     return msg;
 }
+
+/*!
+ * nop
+ */
+__attribute__((always_inline)) inline void nop(void) {
+    __asm__ volatile ("nop");
+}
+
+/*!
+ * Causes an interrupt
+ */
+#define int(n) __asm__ volatile ("int $"  #n)
 
 #endif

@@ -18,6 +18,10 @@ typedef struct {
     uint16_t offset_16;
 }__attribute__((packed)) IDT_ENTRY;
 
-void init_interrupts(void);
+typedef struct {
+    
+} INTERRUPT_FRAME;
+
+void interrupts_init(void);
 
 #endif

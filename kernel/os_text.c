@@ -70,7 +70,7 @@ __attribute((always_inline)) inline void set_cursor(uint16_t line, uint16_t colu
     outb((uint8_t)(pos >> 8), VGA_DATA_REG);
 }
 
-void backspace(void) {
+void text_backspace(void) {
     if (column == 0 && line > 0) {
         line--;
         column = VGA_TEXTMODE_COLUMNS - 1;
@@ -82,21 +82,21 @@ void backspace(void) {
     set_cursor(line, column);
 }
 
-void write_n(const char *string, uint32_t num) {
+void text_write_n(const char *string, uint32_t num) {
     for (uint32_t i = 0; i < num; i++) {
         write_char(string[0]);
     }
     set_cursor(line, column);
 }
 
-void write(const char *string) {
+void text_write(const char *string) {
     while (*string) {
         write_char(*(string++));
     }
     set_cursor(line, column);
 }
 
-void write_c(const char c) {
+void text_write_c(const char c) {
     write_char(c);
     set_cursor(line, column);
 }
@@ -108,7 +108,7 @@ void enable_cursor(void) {
     outb((inb(VGA_DATA_REG) & 0xE0) | 0x0F, VGA_DATA_REG);
 }
 
-void clear(void) {
+void text_clear(void) {
     for (int i = 0; i < VGA_TEXTMODE_CELLS; i++) {
         VGA_TEXTMODE_MEM[2 * i] = 0;
         VGA_TEXTMODE_MEM[2 * i + 1] = 0;
@@ -116,6 +116,13 @@ void clear(void) {
 
     line = 0;
     column = 0;
+}
+
+int text_init(void) {
+    text_clear();
+    
     enable_cursor();
     set_cursor(line, column);
+
+    return 1;
 }

@@ -8,10 +8,10 @@
 #include <stdint.h>
 
 //! Number of entries within a page table/directory.
-#define PAGE_ENTRY_COUNT (1 << 10)
+#define PAGE_ENTRY_COUNT (uint32_t)(1 << 10)
 
 //! Size of a single page or page table/directory.
-#define PAGE_SIZE (1 << 12)
+#define PAGE_SIZE (uint32_t)(1 << 12)
 
 //! Represents a single page entry in a page table.
 typedef union {
@@ -70,13 +70,5 @@ inline void* switch_page_dir(void* page_dir) {
  * \return Address of new page directory.
  */
 void* create_empty_page_dir(void);
-
-#define MAKE_PAGE_ENTRY(addr, flags) (uint32_t)(((uint32_t)(addr) & 0xFFFFF000) | (flags))
-
-#define PAGE_DIRECTORY (PAGE_DIR_ENTRY[PAGE_ENTRY_COUNT])
-#define PAGE_TABLE (PAGE_TABLE_ENTRY[PAGE_ENTRY_COUNT])
-
-#define PAGE_DIR_INDEX(addr) ((uint32_t)(addr) >> 22)
-#define PAGE_TABLE_INDEX(addr) ((uint32_t)(addr) >> 12)
 
 #endif
