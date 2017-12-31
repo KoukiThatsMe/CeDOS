@@ -17,7 +17,7 @@ void *create_kernel_environment() {
     ss_memset(pdir, 0, 3 * PAGE_SIZE);
 
     // map page directory to itself
-    (*pdir)[PAGE_DIR_INDEX(PAGE_ENTRY_COUNT - 1)].entry = MAKE_PAGE_ENTRY(pdir, 0b000000000011);
+    (*pdir)[PAGE_ENTRY_COUNT - 1].entry = MAKE_PAGE_ENTRY(pdir, 0b000000000011);
 
     // map 4M of kernel to 0xC0000000
     (*pdir)[PAGE_DIR_INDEX(KERNEL_VMA)].entry = MAKE_PAGE_ENTRY(kernel, 0b000000000011);

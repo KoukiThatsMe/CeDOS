@@ -124,5 +124,10 @@ int text_init(void) {
     enable_cursor();
     set_cursor(line, column);
 
+    for (uint32_t i = 0; i < 320 * 200; i++) {
+        uint8_t* disp = (uint8_t*)0xA0000;
+        disp[i] = (uint8_t)i;
+    }
+
     return 1;
 }

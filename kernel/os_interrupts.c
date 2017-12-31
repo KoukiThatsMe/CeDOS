@@ -1,5 +1,5 @@
 #include "os_interrupts.h"
-#include "os_text.h"
+#include "driv_text.h"
 
 #define HARDWARE_INTERRUPT (0b10001110)
 #define SYSCALL_INTERRUPT (0b11101110)

@@ -13,6 +13,9 @@
 //! Size of a single page or page table/directory.
 #define PAGE_SIZE (uint32_t)(1 << 12)
 
+typedef void* PHYS_ADDR;
+typedef void* VIRT_ADDR;
+
 //! Represents a single page entry in a page table.
 typedef union {
     uint32_t entry;
@@ -66,9 +69,19 @@ inline void* switch_page_dir(void* page_dir) {
 }
 
 /*!
+ * Invalidates all pages, forces buffer reload.
+ */
+inline void inv_all_pages(void) {
+    __asm__ volatile (  "mov %cr3, %eax\n"
+                        "mov %eax, %cr3");
+}
+
+int map_range_to(PHYS_ADDR page_dir, VIRT_ADDR dest, PHYS_ADDR src, uint32_t page_count, uint32_t flags);
+
+/*!
  * Uses a free page to generate a new page directory which maps its last entry to itself.
  * \return Address of new page directory.
  */
-void* create_empty_page_dir(void);
+PHYS_ADDR create_empty_page_dir(void);
 
 #endif
