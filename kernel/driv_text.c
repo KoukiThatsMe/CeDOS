@@ -1,6 +1,6 @@
 #include "linker.h"
 #include "assembly.h"
-#include "os_string.h"
+#include "string.h"
 
 #define VGA_TEXTMODE_COLUMNS 80
 #define VGA_TEXTMODE_LINES 25

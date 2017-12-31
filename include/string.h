@@ -1,8 +1,8 @@
 /*! \file
  * Defines several functions to manipulate C strings and arrays.
  */
-#ifndef OS_STRING_H
-#define OS_STRING_H
+#ifndef STRING_H
+#define STRING_H
 
 #include <stdint.h>
 
