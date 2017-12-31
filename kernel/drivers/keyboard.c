@@ -1,6 +1,6 @@
-#include "driv_keyboard.h"
-#include "os_interrupts.h"
-#include "driv_pic.h"
+#include "keyboard.h"
+#include "../os_interrupts.h"
+#include "pic.h"
 #include "assembly.h"
 
 

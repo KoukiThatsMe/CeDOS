@@ -1,5 +1,5 @@
 #include "os_interrupts.h"
-#include "driv_text.h"
+#include "drivers/text.h"
 
 #define HARDWARE_INTERRUPT (0b10001110)
 #define SYSCALL_INTERRUPT (0b11101110)
@@ -47,7 +47,7 @@ struct {
     IDT
 };
 
-void interrupts_init(void) {
+int interrupts_init(void) {
     for (uint32_t i = 0; i < array_sizeof(IDT); i++) {
         switch (i) {
             case 0x03:
@@ -60,6 +60,8 @@ void interrupts_init(void) {
             install_interrupt(i, default_isr, 0x08, HARDWARE_INTERRUPT);
             break;
         }
+
+        return 1;
     }
 
     __asm__ volatile (

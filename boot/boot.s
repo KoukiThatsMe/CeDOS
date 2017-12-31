@@ -107,7 +107,7 @@ protected:
   mov %eax, %ss
 
   # jump to second stage code
-  ljmp $0x08, $_ss_start
+  ljmp $0x08, $__SS_START
 
 .code16
 error:

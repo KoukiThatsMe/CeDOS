@@ -13,4 +13,6 @@ typedef uint32_t ProcessID;
  */
 ProcessID sched_exec(void);
 
+int sched_init(void);
+
 #endif

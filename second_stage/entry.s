@@ -1,6 +1,6 @@
 .section .text
-.global _ss_start
-_ss_start:
+.global __SS_START
+__SS_START:
   # copy the kernel code to 0x00100000
   call copy_kernel
 
@@ -17,7 +17,7 @@ _ss_start:
   movl %eax, %cr0
 
   # jump to kernel code
-  ljmp $8, $__KERNEL_VMA
+  ljmp $8, $__KERNEL_START
 
   # loop until the heat death of the universe
 loop:

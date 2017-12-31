@@ -1,6 +1,6 @@
 #include "os_scheduler.h"
 #include "os_paging.h"
-#include "driv_text.h"
+#include "drivers/text.h"
 
 /*!
  * Executes a task.
@@ -12,7 +12,11 @@ ProcessID sched_exec(void) {
     map_range_to(page_dir, (VIRT_ADDR)0x00000000, (PHYS_ADDR)0x00000000, PAGE_ENTRY_COUNT, 0b000000000011);
     
     // will not work because lower memory not mapped
-    text_write("i did it :)\n");
-    while(1) {}
+    text_write("Successfully switched to new page directory.\n");
+    
+    return 0;
+}
 
+int sched_init(void) {
+    return 1;
 }

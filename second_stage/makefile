@@ -4,14 +4,19 @@ S_OBJECTS = $(patsubst %.s,$(LOCAL_BUILD)/%.s.o,$(wildcard *.s))
 C_OBJECTS = $(patsubst %.c,$(LOCAL_BUILD)/%.c.o,$(wildcard *.c))
 OBJECTS = $(S_OBJECTS) $(C_OBJECTS)
 
-.PHONY: build
-build: $(OBJECTS)
-> $(GCC_PREFIX)ld $^ -r -T link.txt -o $(GLOBAL_BUILD)/second_stage.o --oformat elf32-i386
+LOCAL_BUILD = $(GLOBAL_BUILD)/second_stage
 
-.PHONY: rebuild
-rebuild:
-> $(MAKE) clear
-> $(MAKE) build
+.PHONY: build
+build: folder $(SUBDIRS) $(OBJECTS)
+> $(GCC_PREFIX)ld $(wildcard $(LOCAL_BUILD)/*.o) -r -T link.txt -o $(GLOBAL_BUILD)/second_stage.o --oformat elf32-i386
+
+.PHONY: folder
+folder:
+> @mkdir $(LOCAL_BUILD) 2> /dev/null; true
+
+.PHONY: $(SUBDIRS)
+$(SUBDIRS):
+> make -C $@ GLOBAL_BUILD=$(LOCAL_BUILD) build
 
 $(LOCAL_BUILD)/%.s.o: %.s
 > $(GCC_PREFIX)as -o $@ $<

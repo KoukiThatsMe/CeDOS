@@ -1,6 +1,6 @@
 .section .text
-.global _kernel_start
-_kernel_start:
+.global __KERNEL_START
+__KERNEL_START:
   # move stack to kernel space
   mov $__KERNEL_STACK_ADDR, %eax
   mov %eax, %esp

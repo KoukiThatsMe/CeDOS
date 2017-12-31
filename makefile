@@ -14,21 +14,17 @@ GLOBAL_BUILD		= $(CURRENT_DIR)/build/release
 GCC_OPTIONS		= -O1 -Wno-write-strings -Qn -Wall -Wextra -fno-exceptions -nostdlib -nostartfiles -ffreestanding -mgeneral-regs-only
 endif
 
-export GLOBAL_BUILD
 export GCC_OPTIONS
 
-export LOCAL_BUILD = $(GLOBAL_BUILD)
+LOCAL_BUILD = $(GLOBAL_BUILD)
 
 .PHONY: build
 build:
 > @mkdir $(GLOBAL_BUILD) 2> /dev/null; true
-> @mkdir $(GLOBAL_BUILD)/boot 2> /dev/null; true
-> @mkdir $(GLOBAL_BUILD)/second_stage 2> /dev/null; true
-> @mkdir $(GLOBAL_BUILD)/kernel 2> /dev/null; true
-> $(MAKE) LOCAL_BUILD=$(GLOBAL_BUILD)/boot -C boot build
-> $(MAKE) LOCAL_BUILD=$(GLOBAL_BUILD)/second_stage -C second_stage build
-> $(MAKE) LOCAL_BUILD=$(GLOBAL_BUILD)/kernel -C kernel build
-> $(GCC_PREFIX)ld $(wildcard $(GLOBAL_BUILD)/*.o) -T link.txt -Map=$(DEBUG_DIR)/mapfile.txt -o build/base.o
+> $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C boot build
+> $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C second_stage build
+> $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C kernel build
+> $(GCC_PREFIX)ld $(GLOBAL_BUILD)/*.o -T link.txt -Map=$(DEBUG_DIR)/mapfile.txt -o build/base.o
 > $(GCC_PREFIX)objcopy --only-keep-debug build/base.o $(DEBUG_DIR)/base.sym
 > $(GCC_PREFIX)objcopy -O binary build/base.o build/base.img
 

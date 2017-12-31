@@ -22,6 +22,6 @@ typedef struct {
     
 } INTERRUPT_FRAME;
 
-void interrupts_init(void);
+int interrupts_init(void);
 
 #endif
