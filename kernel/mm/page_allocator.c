@@ -1,5 +1,5 @@
-#include "cedos/page_allocator.h"
-#include "cedos/paging.h"
+#include "cedos/mm/page_allocator.h"
+#include "cedos/mm/paging.h"
 
 uint8_t* first_free = (uint8_t*)0x00200000;
 

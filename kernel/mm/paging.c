@@ -1,5 +1,5 @@
-#include "cedos/paging.h"
-#include "cedos/page_allocator.h"
+#include "cedos/mm/paging.h"
+#include "cedos/mm/page_allocator.h"
 #include "linker.h"
 #include "string.h"
 

@@ -1,5 +1,5 @@
 #include "cedos/scheduler.h"
-#include "cedos/paging.h"
+#include "cedos/mm/paging.h"
 #include "cedos/drivers/console.h"
 
 /*!
