@@ -1,6 +1,6 @@
-#include "os_scheduler.h"
-#include "os_paging.h"
-#include "drivers/text.h"
+#include "cedos/scheduler.h"
+#include "cedos/paging.h"
+#include "cedos/drivers/console.h"
 
 /*!
  * Executes a task.
@@ -12,7 +12,7 @@ ProcessID sched_exec(void) {
     map_range_to(page_dir, (VIRT_ADDR)0x00000000, (PHYS_ADDR)0x00000000, PAGE_ENTRY_COUNT, 0b000000000011);
     
     // will not work because lower memory not mapped
-    text_write("Successfully switched to new page directory.\n");
+    vga_con.write_s("Successfully switched to new page directory.\n");
     
     return 0;
 }

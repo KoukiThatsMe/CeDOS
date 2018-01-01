@@ -1,6 +1,6 @@
-#include "os_paging.h"
+#include "cedos/paging.h"
+#include "cedos/page_allocator.h"
 #include "linker.h"
-#include "os_page_allocator.h"
 #include "string.h"
 
 #define MAKE_PAGE_ENTRY(addr, flags) (uint32_t)(((uint32_t)(addr) & 0xFFFFF000) | (flags))

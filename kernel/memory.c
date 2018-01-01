@@ -1,4 +1,4 @@
-#include "os_memory.h"
+#include "cedos/memory.h"
 
 /*!
  * Allocates a block of \p size bytes of memory. (KERNEL MODE)

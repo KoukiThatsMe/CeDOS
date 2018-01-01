@@ -1,8 +1,8 @@
 /*! \file
  * Provides functions for memory allocation.
  */
-#ifndef OS_MEMORY_H
-#define OS_MEMORY_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #include <stdint.h>
 

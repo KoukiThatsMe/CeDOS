@@ -1,8 +1,8 @@
 /*! \file
  * Interface for accessing the programmable interrupt contoller (PIC).
  */
-#ifndef OS_PIC_H
-#define OS_PIC_H
+#ifndef PIC_H
+#define PIC_H
 
 #define PIC1_COMMAND			0x20
 #define PIC1_DATA				0x21

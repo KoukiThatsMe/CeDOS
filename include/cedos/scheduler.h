@@ -1,8 +1,8 @@
 /*! \file
  * Manages the distribution of processing time among processes.
  */
-#ifndef OS_SCHEDULER_H
-#define OS_SCHEDULER_H
+#ifndef SCHEDULER_H
+#define SCHEDULER_H
 
 #include <stdint.h>
 

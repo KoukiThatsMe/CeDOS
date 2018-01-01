@@ -10,7 +10,7 @@ SUBDIRS = $(wildcard */.)
 
 .PHONY: build
 build: folder $(SUBDIRS) $(OBJECTS)
-> $(GCC_PREFIX)ld $(LOCAL_BUILD)/*.o -r -e _kernel_start -Map=$(DEBUG_DIR)/kernel_map.txt -o $(GLOBAL_BUILD)/kernel.o --oformat elf32-i386
+> $(GCC_PREFIX)ld $(LOCAL_BUILD)/*.o -r -e _kernel_start -o $(GLOBAL_BUILD)/kernel.o --oformat elf32-i386
 
 .PHONY: folder
 folder:

@@ -22,7 +22,6 @@ LOCAL_BUILD = $(GLOBAL_BUILD)
 build:
 > @mkdir $(GLOBAL_BUILD) 2> /dev/null; true
 > $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C boot build
-> $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C second_stage build
 > $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C kernel build
 > $(GCC_PREFIX)ld $(GLOBAL_BUILD)/*.o -T link.txt -Map=$(DEBUG_DIR)/mapfile.txt -o build/base.o
 > $(GCC_PREFIX)objcopy --only-keep-debug build/base.o $(DEBUG_DIR)/base.sym
@@ -35,15 +34,6 @@ clear:
 .PHONY: run
 run:
 > ./run.sh
-
-.PHONY: rebuild
-rebuild:
-> $(MAKE) $(MAKEFLAGS) clear
-> $(MAKE) $(MAKEFLAGS) build
-
-.PHONY: objdump
-objdump:
-> $(GCC_PREFIX)objdump -D $(FILE) > debug/objdump.txt
 
 .PHONY: debug
 debug:

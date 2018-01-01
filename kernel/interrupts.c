@@ -1,5 +1,5 @@
-#include "os_interrupts.h"
-#include "drivers/text.h"
+#include "cedos/interrupts.h"
+#include "cedos/drivers/console.h"
 
 #define HARDWARE_INTERRUPT (0b10001110)
 #define SYSCALL_INTERRUPT (0b11101110)
@@ -15,16 +15,16 @@
     }
 
 __attribute__((interrupt)) volatile void default_isr(INTERRUPT_FRAME *frame) {
-    text_write("interrupt was issued\n");
+    vga_con.write_s("interrupt was issued\n");
 }
 
 __attribute__((interrupt)) volatile void breakpoint_isr(INTERRUPT_FRAME *frame) {
-    text_write("BREAKPOINT WAS HIT\n");
+    vga_con.write_s("BREAKPOINT WAS HIT\n");
     // dump registers to stdout
 }
 
 __attribute__((interrupt)) volatile void double_fault_isr(INTERRUPT_FRAME *frame) {
-    text_write("CRITICAL: DOUBLE FAULT\n");
+    vga_con.write_s("CRITICAL: DOUBLE FAULT\n");
     //while (1) {}
 }
 
