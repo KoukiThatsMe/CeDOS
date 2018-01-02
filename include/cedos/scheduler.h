@@ -6,13 +6,17 @@
 
 #include <stdint.h>
 
-typedef uint32_t ProcessID;
+#include "cedos/process.h"
+#include "cedos/mm/paging.h"
 
 /*!
  * Executes a task.
  */
-ProcessID sched_exec(void);
+PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, VIRT_ADDR esp);
 
+/*!
+ * Initializes the scheduler.
+ */
 int sched_init(void);
 
 #endif

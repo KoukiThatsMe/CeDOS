@@ -7,7 +7,7 @@
 
 #define VGA_TEXT_COLOR 0x02
 
-const uint8_t const *display_start = (uint8_t*)0xB8000;
+uint8_t const *display_start = (uint8_t*)0xB8000;
 uint8_t *display = (uint8_t*)0xB8000;
 
 void simple_clear(void) {

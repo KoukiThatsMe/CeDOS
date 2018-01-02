@@ -2,28 +2,32 @@
 #include "cedos/interrupts.h"
 #include "cedos/pic.h"
 #include "cedos/scheduler.h"
+#include "cedos/mm/paging.h"
+#include "cedos/kernel.h"
 
 int os_init(void) {
     vga_con.init();
-    vga_con.write_s("TTY output initialized.\n");
+    printk("TTY output initialized.\n");
 
-    vga_con.write_s("Initializing PIC...");
+    printk("Initializing PIC...");
     pic_init();
-    vga_con.write_s("done.\n");
+    printk("done.\n");
     
-    vga_con.write_s("Initializing interrupts...");
+    printk("Initializing interrupts...");
     interrupts_init();
-    vga_con.write_s("done.\n");
+    printk("done.\n");
 
-    vga_con.write_s("Initialization finished.\n--------------\n");
+    printk("Initialization finished.\n--------------\n");
+
+    return 1;
 }
 
 int os_main(void) {
     //const char* string[] = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
-    vga_con.write_s("Starting scheduler.\n");
-    sched_exec();
+    printk("Starting scheduler.\n");
+    sched_exec(create_empty_page_dir(), (void*)0, (void*)0);
 
-    vga_con.write_s("Main procedure terminating.\n");
+    printk("Main procedure terminating.\n");
     return 0;
 }

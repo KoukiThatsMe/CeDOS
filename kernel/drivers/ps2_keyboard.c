@@ -22,14 +22,14 @@ KB_DRIVER ps2_kb = {
     ps2_kb_read
 };
 
-__attribute__((interrupt)) volatile void keyboard_int_handler(INTERRUPT_FRAME *frame) {
+__attribute__((interrupt)) void keyboard_int_handler(INTERRUPT_FRAME *frame) {
 
 }
 
 int ps2_kb_init(void) {
-
+    return 1;
 }
 
 uint8_t ps2_kb_read(void) {
-
+    return 0;
 }

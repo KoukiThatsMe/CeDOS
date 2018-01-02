@@ -6,6 +6,8 @@
 
 #include <stdint.h>
 
+#define NULL ((void*)0)
+
 /*!
  * Unsigned integral type.
  */

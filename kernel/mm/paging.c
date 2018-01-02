@@ -22,20 +22,24 @@
         ((PAGE_TABLE_ENTRY*)(PAGE_MAPPED_ADDR((PAGE_ENTRY_COUNT - 2), index)))
 #define PAGE_DIR_ALT_MAPPED_ADDR \
         ((PAGE_DIR_ENTRY*)(PAGE_TABLE_ALT_MAPPED_ADDR(PAGE_ENTRY_COUNT - 1)))
-
+        
 #define PAGE_TABLE_FLAGS 0b000000000011
-
+        
+__attribute__((always_inline)) inline int is_present(uint32_t entry) {
+    return (entry & 0b000000000001);
+}
+        
 /*!
 * WARNING: This method assumes the target page directory has already been mounted
 * to the second to last page directory entry
 */
-inline int is_addr_available(uint32_t dir_index, uint32_t table_index) {
+__attribute__((always_inline)) inline int is_addr_available(uint32_t dir_index, uint32_t table_index) {
     PAGE_DIR_ENTRY* page_dir = PAGE_DIR_ALT_MAPPED_ADDR;
     PAGE_TABLE_ENTRY* page_table = PAGE_TABLE_ALT_MAPPED_ADDR(table_index);
     
-    if(!(page_dir[dir_index].fields.present)) {
+    if(!is_present(page_dir[dir_index])) {
         return 1;
-    } else if (!(page_table[table_index].fields.present)) {
+    } else if (!is_present(page_table[table_index])) {
         return 1;
     } else {
         return 0;
@@ -52,20 +56,25 @@ int map_page_to(PHYS_ADDR page_addr, uint32_t dir_index, uint32_t table_index, u
     
     int tmp = 0;
 
-    if (!(page_dir[dir_index].fields.present)) {
+    if (!is_present(page_dir[dir_index])) {
         // acquire new page table
         void *new_page_table = get_free_page();
-        page_dir[dir_index].entry = MAKE_PAGE_ENTRY(new_page_table, PAGE_TABLE_FLAGS);
+        page_dir[dir_index] = MAKE_PAGE_ENTRY(new_page_table, PAGE_TABLE_FLAGS);
     }
 
-    if (!(page_table[table_index].fields.present)) {
+    if (!is_present(page_table[table_index])) {
         // map page
-        page_table[table_index].entry = MAKE_PAGE_ENTRY(page_addr, flags);
+        page_table[table_index] = MAKE_PAGE_ENTRY(page_addr, flags);
         return 1;
     } else {
         // didn't works
         return 0;
     }
+}
+
+void mount_page_dir(PHYS_ADDR page_dir) {
+    PAGE_DIR_ENTRY *cur_page_dir = PAGE_DIR_MAPPED_ADDR;
+    cur_page_dir[PAGE_ENTRY_COUNT - 2] = MAKE_PAGE_ENTRY(page_dir, PAGE_TABLE_FLAGS);
 }
 
 int map_range_to(PHYS_ADDR page_dir, VIRT_ADDR dest, PHYS_ADDR src, uint32_t page_count, uint32_t flags) {
@@ -76,7 +85,7 @@ int map_range_to(PHYS_ADDR page_dir, VIRT_ADDR dest, PHYS_ADDR src, uint32_t pag
         uint32_t dir_index = PAGE_DIR_INDEX(dest + i * PAGE_SIZE);
         uint32_t table_index = PAGE_TABLE_INDEX(dest + i * PAGE_SIZE);
         
-        if (!(is_addr_available(dir_index, table_index))) { return 0; }
+        if (!is_addr_available(dir_index, table_index)) { return 0; }
     }
     
     for (uint32_t i = 0; i < page_count; i++) {
@@ -85,11 +94,8 @@ int map_range_to(PHYS_ADDR page_dir, VIRT_ADDR dest, PHYS_ADDR src, uint32_t pag
         
         map_page_to(src + i * PAGE_SIZE, dir_index, table_index, flags);
     }
-}
 
-void mount_page_dir(PHYS_ADDR page_dir) {
-    PAGE_DIR_ENTRY *cur_page_dir = PAGE_DIR_MAPPED_ADDR;
-    cur_page_dir[PAGE_ENTRY_COUNT - 2].entry = MAKE_PAGE_ENTRY(page_dir, PAGE_TABLE_FLAGS);
+    return 1;
 }
 
 VIRT_ADDR map_first_free(PHYS_ADDR page_dir, VIRT_ADDR search_start, PHYS_ADDR page, uint32_t flags) {
@@ -118,12 +124,12 @@ PHYS_ADDR create_empty_page_dir(void) {
     memset(page_dir, 0, PAGE_SIZE);
     
     // map to itself
-    page_dir[PAGE_ENTRY_COUNT - 1].entry = MAKE_PAGE_ENTRY(page_dir_phys, PAGE_TABLE_FLAGS);
+    page_dir[PAGE_ENTRY_COUNT - 1] = MAKE_PAGE_ENTRY(page_dir_phys, PAGE_TABLE_FLAGS);
     
     page_dir = PAGE_DIR_ALT_MAPPED_ADDR;
     
     // map kernel
-    page_dir[PAGE_DIR_INDEX(0xc0000000)].entry = PAGE_DIR_MAPPED_ADDR[PAGE_DIR_INDEX(0xc0000000)].entry;
+    page_dir[PAGE_DIR_INDEX(0xc0000000)] = PAGE_DIR_MAPPED_ADDR[PAGE_DIR_INDEX(0xc0000000)];
 
     return page_dir_phys;
 }

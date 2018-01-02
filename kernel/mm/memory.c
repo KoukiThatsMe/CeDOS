@@ -6,7 +6,7 @@
  * \return Memory address to the new memory block
  */
 void* os_kernel_malloc(size_t size) {
-
+    return (void*)0;
 }
 
 /*!
@@ -14,7 +14,7 @@ void* os_kernel_malloc(size_t size) {
  * \param ptr Pointer to the memory block to be freed.
  */
 void os_kernel_free(void* ptr) {
-
+    
 }
 
 /*!
@@ -23,7 +23,7 @@ void os_kernel_free(void* ptr) {
  * \return Memory address to the new memory block
  */
 void* os_user_malloc(size_t size) {
-
+    return (void*)0;
 }
 
 /*!

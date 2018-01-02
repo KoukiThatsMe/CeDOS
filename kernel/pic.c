@@ -6,7 +6,7 @@
  * Moves irqs to appropriate addresses and enables all PIC interrupts
  * \return 1 on success, 0 on fail
  */
-volatile int pic_init(void) {
+int pic_init(void) {
     // start initialization sequence
     outb(0x11, PIC1_COMMAND);
     outb(0x11, PIC2_COMMAND);
@@ -30,6 +30,8 @@ volatile int pic_init(void) {
     // clear interrupt masks
     outb(0xff, PIC1_DATA);
     outb(0xff, PIC2_DATA);
+
+    return 1;
 }
 
 /*!
@@ -50,6 +52,8 @@ int pic_unmask_interrupt(int irq) {
     uint8_t mask = inb(port);
     mask &= ~(1 << irq);
     outb(mask, port);
+
+    return 1;
 }
 
 /*!
@@ -70,4 +74,6 @@ int pic_mask_interrupt(int irq) {
     uint8_t mask = inb(port);
     mask |= 1 << irq;
     outb(mask, port);
+
+    return 1;
 }

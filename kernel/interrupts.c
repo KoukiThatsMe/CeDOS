@@ -14,16 +14,16 @@
         (uint16_t)(0xC000) \
     }
 
-__attribute__((interrupt)) volatile void default_isr(INTERRUPT_FRAME *frame) {
+__attribute__((interrupt)) void default_isr(INTERRUPT_FRAME *frame) {
     vga_con.write_s("interrupt was issued\n");
 }
 
-__attribute__((interrupt)) volatile void breakpoint_isr(INTERRUPT_FRAME *frame) {
+__attribute__((interrupt)) void breakpoint_isr(INTERRUPT_FRAME *frame) {
     vga_con.write_s("BREAKPOINT WAS HIT\n");
     // dump registers to stdout
 }
 
-__attribute__((interrupt)) volatile void double_fault_isr(INTERRUPT_FRAME *frame) {
+__attribute__((interrupt)) void double_fault_isr(INTERRUPT_FRAME *frame) {
     vga_con.write_s("CRITICAL: DOUBLE FAULT\n");
     //while (1) {}
 }
@@ -60,13 +60,13 @@ int interrupts_init(void) {
             install_interrupt(i, default_isr, 0x08, HARDWARE_INTERRUPT);
             break;
         }
-
-        return 1;
     }
-
+    
     __asm__ volatile (
             "lidt (%0)\n"
             "sti" : : 
             "m" (IDT_DESC)
         );
+
+    return 1;
 }
