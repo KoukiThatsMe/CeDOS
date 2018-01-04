@@ -4,15 +4,17 @@
 #ifndef PIC_H
 #define PIC_H
 
+#include "assembly.h"
+
 #define PIC1_COMMAND			0x20
 #define PIC1_DATA				0x21
 #define PIC2_COMMAND			0xA0
 #define PIC2_DATA				0xA1
 
-#define PIC_END_OF_INTERRUPT	0x20
-
 #define PIC1_OFFSET				0x20
 #define PIC2_OFFSET				0x28
+
+#define PIC_END_OF_INTERRUPT	0x20
 
 /*!
  * Moves irqs to appropriate addresses and enables all PIC interrupts
@@ -33,5 +35,17 @@ int pic_unmask_interrupt(int irq);
  * \return 1 on success, 0 on fail
  */
 int pic_mask_interrupt(int irq);
+
+/*!
+ * Sends an end-of-interrupt-signal to the corresponding PIC.
+ */
+inline void pic1_eoi(void) {
+    outb(PIC_END_OF_INTERRUPT, PIC1_COMMAND);
+}
+
+inline void pic2_eoi(void) {
+    outb(PIC_END_OF_INTERRUPT, PIC2_COMMAND);
+    outb(PIC_END_OF_INTERRUPT, PIC1_COMMAND);
+}
 
 #endif

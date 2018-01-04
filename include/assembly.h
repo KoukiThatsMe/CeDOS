@@ -34,8 +34,35 @@ __attribute__((always_inline)) inline void nop(void) {
 }
 
 /*!
+ * Deactivates all interrupts.
+ */
+__attribute__((always_inline)) inline void cli(void) {
+    __asm__ volatile ("cli");
+}
+
+/*!
+ * Reactivates all interrupts.
+ */
+__attribute__((always_inline)) inline void sti(void) {
+    __asm__ volatile ("sti");
+}
+
+/*!
+ * CPUID
+ */
+__attribute__((always_inline)) inline void cpuid(uint32_t eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx) {
+    __asm__ volatile (  "mov %3, %%eax;"
+                        "cpuid;"
+                        "mov %%ebx, %0;"
+                        "mov %%ecx, %1;"
+                        "mov %%edx, %2"
+                        : "=m" (*ebx), "=m" (*ecx), "=m" (*edx)
+                        : "Nd" (eax));
+}
+
+/*!
  * Causes an interrupt
  */
-#define int(n) __asm__ volatile ("int $"  #n)
+#define INT(n) __asm__ volatile ("int $"  #n)
 
 #endif

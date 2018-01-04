@@ -1,6 +1,7 @@
 #include "linker.h"
 #include "paging.h"
 
+/*
 #define VGA_TEXTMODE_COLUMNS 80
 #define VGA_TEXTMODE_LINES 25
 #define VGA_TEXTMODE_CELLS (VGA_TEXTMODE_COLUMNS * VGA_TEXTMODE_LINES)
@@ -34,17 +35,13 @@ void simple_println(const char *src) {
         display++;
     }
 }
+*/
 
 void copy_kernel(void) {
-    simple_clear();
-    simple_print("COPYING_KERNEL...");
-
     uint8_t *kernel_dest = (uint8_t*)0x00100000;
     uint8_t *kernel_src = (SS_VMA + (KERNEL_LMA - SS_LMA));
     
     for (uint32_t i = 0; i < KERNEL_SIZE; i++) {
         kernel_dest[i] = kernel_src[i];
     }
-
-    simple_println("DONE.");
 }

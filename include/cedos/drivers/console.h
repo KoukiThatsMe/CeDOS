@@ -1,8 +1,8 @@
 /*! \file
- * Driver for VGA textmode output
+ * Driver for consoles.
  */
-#ifndef TEXT_H
-#define TEXT_H
+#ifndef CONSOLE_H
+#define CONSOLE_H
 
 #include <stdint.h>
 
@@ -47,5 +47,7 @@ typedef struct {
 
 //! VGA console driver (default driver)
 CON_DRIVER vga_con;
+
+CON_DRIVER *std_con;
 
 #endif

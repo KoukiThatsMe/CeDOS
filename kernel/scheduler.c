@@ -2,7 +2,7 @@
 #include "cedos/process.h"
 #include "cedos/mm/paging.h"
 #include "cedos/drivers/console.h"
-#include "cedos/kernel.h"
+#include "cedos/core.h"
 
 PROCESS* get_slot(void) {
     static PROCESS free_slots[4];
@@ -29,5 +29,15 @@ PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, VIRT_ADDR esp) {
 
 int sched_init(void) {
     // TODO: create and start idle process
+
+    //sched_exec(create_empty_page_dir(), (void*)0, (void*)0);
     return 1;
+}
+
+int sched_dispatcher(void) {
+
+}
+
+INTERRUPT(sched_interrupt, frame) {
+
 }

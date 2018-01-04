@@ -1,8 +1,8 @@
 /*! \file
- * Driver for PS/2 keyboard
+ * Driver for keyboards.
  */
-#ifndef OS_KEYBOARD_H
-#define OS_KEYBOARD_H
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
 
 #include <stdint.h>
 
@@ -30,5 +30,7 @@ typedef struct {
 
 //! PS/2 keyboard driver (default driver)
 KB_DRIVER ps2_kb;
+
+KB_DRIVER *std_kb;
 
 #endif
