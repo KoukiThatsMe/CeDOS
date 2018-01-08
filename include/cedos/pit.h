@@ -36,4 +36,6 @@ typedef enum {
  */
 void pit_setup_channel(PIT_CHANNEL channel, PIT_MODE mode, uint16_t freq_div);
 
+void pit_init(void);
+
 #endif

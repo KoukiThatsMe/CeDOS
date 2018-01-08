@@ -39,11 +39,11 @@ int pic_mask_interrupt(int irq);
 /*!
  * Sends an end-of-interrupt-signal to the corresponding PIC.
  */
-inline void pic1_eoi(void) {
+__attribute__((always_inline)) inline void pic1_eoi(void) {
     outb(PIC_END_OF_INTERRUPT, PIC1_COMMAND);
 }
 
-inline void pic2_eoi(void) {
+__attribute__((always_inline)) inline void pic2_eoi(void) {
     outb(PIC_END_OF_INTERRUPT, PIC2_COMMAND);
     outb(PIC_END_OF_INTERRUPT, PIC1_COMMAND);
 }

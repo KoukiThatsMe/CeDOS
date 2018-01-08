@@ -1,10 +1,8 @@
 #include "cedos/interrupts.h"
 #include "cedos/drivers/console.h"
 #include "cedos/pic.h"
-
-#define INT_GATE (0b10001110)
-#define TRAP_GATE (0b10001111)
-#define SYSCALL_INTERRUPT (0b11101110)
+#include "cedos/core.h"
+#include "cedos/pit.h"
 
 #define array_sizeof(array) (sizeof(array)/sizeof(array[0]))
 
@@ -50,14 +48,15 @@ INTERRUPT(pic2_handler, frame) {
     pic2_eoi();
 }
 
-IDT_ENTRY IDT[31];
+IDT_ENTRY IDT[INTERRUPT_COUNT];
+void (*INT_HANDLERS[INTERRUPT_COUNT])(void);
 
-void install_interrupt(int index, void* func, uint16_t selector, uint8_t type) {
-    IDT[index].offset_0 = (uint16_t)((uint32_t)func);
-    IDT[index].selector = selector;
-    IDT[index].__zero = 0;
-    IDT[index].type_attr = type;
-    IDT[index].offset_16 = (uint16_t)((uint32_t)(func) >> 16);
+void install_interrupt(int num, void* func, uint16_t selector, uint8_t type) {
+    IDT[num].offset_0 = (uint16_t)((uint32_t)func);
+    IDT[num].selector = selector;
+    IDT[num].__zero = 0;
+    IDT[num].type_attr = type;
+    IDT[num].offset_16 = (uint16_t)((uint32_t)(func) >> 16);
 }
 
 struct {
@@ -69,7 +68,7 @@ struct {
 };
 
 int interrupts_init(void) {
-    for (uint32_t i = 0; i < array_sizeof(IDT); i++) {
+    for (uint32_t i = 0; i < INTERRUPT_COUNT; i++) {
         if (i == 0x03) {
             install_interrupt(i, breakpoint_isr, 0x08, INT_GATE);
         } else if (i == 0x08) {

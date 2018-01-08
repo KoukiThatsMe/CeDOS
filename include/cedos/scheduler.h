@@ -19,4 +19,9 @@ PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, VIRT_ADDR esp);
  */
 int sched_init(void);
 
+/*!
+ * Starts the scheduler.
+ */
+int sched_start(void);
+
 #endif

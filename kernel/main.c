@@ -1,6 +1,7 @@
 #include "cedos/drivers/console.h"
 #include "cedos/interrupts.h"
 #include "cedos/pic.h"
+#include "cedos/pit.h"
 #include "cedos/scheduler.h"
 #include "cedos/mm/paging.h"
 #include "cedos/core.h"
@@ -13,12 +14,16 @@ int os_init(void) {
     printk("Initializing PIC...");
     pic_init();
     printk("done.\n");
+
+    printk("Initializing PIT...");
+    pit_init();
+    printk("done.\n");
     
     printk("Initializing interrupts...");
     interrupts_init();
     printk("done.\n");
 
-    printk("Activating interrupts...");
+    printk("Setting up timer interrupts...");
     sti();
     printk("done.\n");
 
@@ -38,12 +43,18 @@ void infodump(void) {
     printk("CPU manufacturer: %s\n", res);
 }
 
+extern uint8_t* IDT;
+
 int os_main(void) {
+    //pic_unmask_interrupt(0);
     infodump();
 
-    kpanic("SIMULATED KERNEL PANIC");
+    printk("Starting scheduler.");
+    sched_start();
+
+    //kpanic("SIMULATED KERNEL PANIC");
 
     // won't be executed
-    printk("Main procedure terminating.\n");
+    //printk("Main procedure terminating.\n");
     return 0;
 }

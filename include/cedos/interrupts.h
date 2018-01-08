@@ -7,8 +7,14 @@
 
 #include <stdint.h>
 
-#define INTERRUPT(name, frame) __attribute__((interrupt)) void name(INTERRUPT_FRAME *frame)
-#define EXCEPTION(name, frame, err_code) __attribute__((interrupt)) void name(INTERRUPT_FRAME *frame, uword_t err_code)
+#define INTERRUPT(name, frame) __attribute__((interrupt, optimize("O0"))) void name(INTERRUPT_FRAME *frame)
+#define EXCEPTION(name, frame, err_code) __attribute__((interrupt, optimize("O0"))) void name(INTERRUPT_FRAME *frame, uword_t err_code)
+
+#define INT_GATE (0b10001110)
+#define TRAP_GATE (0b10001111)
+#define SYSCALL_INTERRUPT (0b11101110)
+
+#define INTERRUPT_COUNT 0x31
 
 /*!
  * Represents a single entry of the IDT.
@@ -30,5 +36,6 @@ typedef struct {
 typedef uint32_t uword_t;
 
 int interrupts_init(void);
+void install_interrupt(int num, void* func, uint16_t selector, uint8_t type);
 
 #endif

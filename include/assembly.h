@@ -48,6 +48,34 @@ __attribute__((always_inline)) inline void sti(void) {
 }
 
 /*!
+ * Pushes the contents of the EFLAGS register onto the stack.
+ */
+__attribute__((always_inline)) inline void pushf(void) {
+    __asm__ volatile ("pushf");
+}
+
+/*!
+ * Pops the contents of the EFLAGS register from the top of the stack.
+ */
+__attribute__((always_inline)) inline void popf(void) {
+    __asm__ volatile ("popf");
+}
+
+/*!
+ * Pushes the contents of the general purpose registers onto the stack.
+ */
+__attribute__((always_inline)) inline void pusha(void) {
+    __asm__ volatile ("pusha");
+}
+
+/*!
+ * Pops the contents of the general purpose registers off the top of the stack.
+ */
+__attribute__((always_inline)) inline void popa(void) {
+    __asm__ volatile ("popa");
+}
+
+/*!
  * CPUID
  */
 __attribute__((always_inline)) inline void cpuid(uint32_t eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx) {

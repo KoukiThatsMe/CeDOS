@@ -27,7 +27,7 @@ int pic_init(void) {
     outb(0x01, PIC2_DATA);
     nop(); nop(); nop(); nop();
 
-    // clear interrupt masks
+    // mask all interrupts
     outb(0xff, PIC1_DATA);
     outb(0xff, PIC2_DATA);
 
@@ -42,7 +42,7 @@ int pic_init(void) {
 int pic_unmask_interrupt(int irq) {
     uint16_t port;
 
-    if (irq >= 8) {
+    if (irq < 8) {
         port = PIC1_DATA;    
     } else {
         port = PIC2_DATA;
@@ -64,7 +64,7 @@ int pic_unmask_interrupt(int irq) {
 int pic_mask_interrupt(int irq) {
     uint16_t port;
     
-    if (irq >= 8) {
+    if (irq < 8) {
         port = PIC1_DATA;    
     } else {
         port = PIC2_DATA;
