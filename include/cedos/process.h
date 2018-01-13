@@ -10,10 +10,10 @@
  * Defines all possible states for processes.
  */
 typedef enum {
-    PSTATE_TERMINATED
+    PSTATE_TERMINATED,
     PSTATE_READY,
     PSTATE_RUNNING,
-    PSTATE_BLOCKED,
+    PSTATE_BLOCKED
 } PROCESS_STATE;
 
 /*!

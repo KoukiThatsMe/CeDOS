@@ -70,9 +70,9 @@ int os_main(void) {
 
     // create test tasks
     printk("Creating tasks.\n");
-    sched_exec(create_empty_page_dir(), task1, eflags(), 0xC0280000);
-    sched_exec(create_empty_page_dir(), task2, eflags(), 0xC0300000);
-    sched_exec(create_empty_page_dir(), task3, eflags(), 0xC0380000);
+    sched_exec(create_empty_page_dir(), task1, get_eflags());
+    sched_exec(create_empty_page_dir(), task2, get_eflags());
+    sched_exec(create_empty_page_dir(), task3, get_eflags());
 
     printk("Starting scheduler.\n");
     sched_start();

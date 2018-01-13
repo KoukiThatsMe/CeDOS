@@ -10,7 +10,7 @@
 #include "common.h"
 #include "cedos/drivers/speaker.h"
 
-void* const SCHED_STACK = (void*)(0xC0400000);
+#define KERNEL_PRIVATE_STACK (void*)(0xC0600000)
 
 PROCESS* get_slot(void) {
     static PROCESS free_slots[4];
@@ -23,15 +23,16 @@ int sched_dispatcher(void);
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags, VIRT_ADDR ebp) {
+PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags) {
+    crit_enter();
     PHYS_ADDR tmp_page_dir = switch_page_dir(page_dir);
     PROCESS* p = get_slot();
     
     // set process context
     p->page_dir = page_dir;
     p->eip = sched_dispatcher;
-    p->ebp = ebp;
-    p->esp = ebp - sizeof(SCHED_FRAME);
+    p->ebp = KERNEL_PRIVATE_STACK;
+    p->esp = KERNEL_PRIVATE_STACK - sizeof(SCHED_FRAME);
     p->eflags = eflags;
     p->entry = (PROCESS_MAIN*)eip;
 
@@ -51,6 +52,7 @@ PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags, VIRT_A
 
     switch_page_dir(tmp_page_dir);
 
+    crit_exit();
     return add_process(p);
 }
 
@@ -97,13 +99,13 @@ void idle(void) {
 
 int sched_init(void) {
     // create idle process
-    sched_exec(create_empty_page_dir(), idle, eflags() | (1 << 9), 0xC0200000);
+    sched_exec(create_empty_page_dir(), idle, get_eflags());
 
     return 1;
 }
 
 int sched_start(void) {
-    current_pid = get_process(0);
+    current_pid = 0;
 
     // perform the first timer interrupt manually
     pic_unmask_interrupt(0);
@@ -115,14 +117,16 @@ void sched_yield(void) {
 }
 
 int sched_kill(PROCESS_ID pid) {
+    crit_enter();
     if (pid == current_pid) {
         //remove_process(pid);
         sched_yield();
-        return 1;
     } else {
         //remove_process(pid);
-        return 1;
     }
+
+    crit_exit();
+    return 1;
 }
 
 int sched_dispatcher(void) {

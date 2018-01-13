@@ -12,5 +12,7 @@ int core_init(void);
 void printk(const char* string, ...);
 void kpanic(const char* string);
 void memdump(void* start, uint32_t size);
+void crit_enter(void);
+void crit_exit(void);
 
 #endif

@@ -77,7 +77,7 @@ void regdump(void) {
 }
 
 void printk(const char* fmt, ...) {
-    uint32_t eflags = disable_interrupts();
+    crit_enter();
     va_list args;
     va_start(args, fmt);
     uint32_t index = 0;
@@ -107,7 +107,7 @@ void printk(const char* fmt, ...) {
         fmt++;
     }
 
-    restore_interrupts(eflags);
+    crit_exit();
 }
 
 void kpanic(const char* string) {
@@ -117,6 +117,16 @@ void kpanic(const char* string) {
     regdump();
     stackdump();
     while (1) {}
+}
+
+uint32_t volatile eflags = 0;
+void crit_enter(void) {
+    eflags = get_eflags();
+    cli();
+}
+
+void crit_exit(void) {
+    set_eflags(eflags);
 }
 
 int core_init(void) {

@@ -29,7 +29,13 @@ typedef struct {
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags, VIRT_ADDR ebp);
+PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags);
+
+/*!
+ * Return the ID of the current process.
+ * \return ID of current process.
+ */
+PROCESS_ID sched_get_current_process(void);
 
 /*!
  * Initializes the scheduler.

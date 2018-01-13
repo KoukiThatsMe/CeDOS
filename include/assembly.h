@@ -92,10 +92,18 @@ __attribute__((always_inline)) inline void cpuid(uint32_t eax, uint32_t *ebx, ui
  * Used to find out the current value of the flags register.
  * \return Value of the EFLAGS-register.
  */
-__attribute((always_inline)) inline uint32_t eflags() {
+__attribute((always_inline)) inline uint32_t get_eflags() {
     uint32_t eflags;
     __asm__ volatile ("pushf; pop %%eax; mov %%eax, %0" : "=m" (eflags) : : "eax");
     return eflags;
+}
+
+/*!
+ * Sets the value of the EFLAGS-register.
+ * \param eflags New value of the EFLAGS-register.
+ */
+__attribute__((always_inline)) inline void set_eflags(uint32_t eflags) {
+    __asm__ volatile ("mov %0, %%eax; push %%eax; popf" : : "m" (eflags) : "eax");
 }
 
 /*!
@@ -103,24 +111,6 @@ __attribute((always_inline)) inline uint32_t eflags() {
  */
 __attribute__((always_inline)) inline void hlt(void) {
     __asm__ volatile ("hlt");
-}
-
-/*!
- * Disables interrupts and returns the current EFLAGS-value.
- * \return Current value of the EFLAGS-register.
- */
-__attribute__((always_inline)) inline uint32_t disable_interrupts(void) {
-    uint32_t eflags;
-    __asm__ volatile ("pushf; cli; pop %%eax; mov %%eax, %0" : "=m" (eflags) : : "eax");
-    return eflags;
-}
-
-/*!
- * Restores a prior state of the EFLAGS-register. Used in tandem with \m disable_interrupts.
- * \param eflags Prior state of the EFLAGS-register.
- */
-__attribute__((always_inline)) inline void restore_interrupts(uint32_t eflags) {
-    __asm__ volatile ("mov %0, %%eax; push %%eax; popf" : : "m" (eflags) : "eax");
 }
 
 /*!

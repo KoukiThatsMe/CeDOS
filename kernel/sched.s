@@ -9,8 +9,8 @@ sched_interrupt:
   // switch to scheduler stack
   mov %esp, %eax
   mov %ebp, %ebx
-  mov $SCHED_STACK, %esp
-  mov $SCHED_STACK, %ebp
+  mov $0xC0400000, %esp
+  mov $0xC0400000, %ebp
 
   // pass process stack as arguments
   push %ebx
