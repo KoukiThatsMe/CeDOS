@@ -71,14 +71,14 @@ void sched_interrupt_c(SCHED_FRAME * volatile frame, uint32_t volatile ebp) {
 
     // select next process
     static int pid = 0;
-    pid = (pid + 1) % 4;
+    pid = pid % 3 + 1;
     current_pid = pid;
 
     printk("\n### SCHEDULER: SWITCH TO TASK %i\n", pid);
 
     // prepare to return to process
-    switch_page_dir(process->page_dir);
     process = get_process(current_pid);
+    switch_page_dir(process->page_dir);
     frame = (volatile SCHED_FRAME*)(process->esp);
     ebp = process->ebp;
     frame->eip = process->eip;

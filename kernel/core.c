@@ -77,7 +77,7 @@ void regdump(void) {
 }
 
 void printk(const char* fmt, ...) {
-    crit_enter();
+    //crit_enter();
     va_list args;
     va_start(args, fmt);
     uint32_t index = 0;
@@ -107,7 +107,7 @@ void printk(const char* fmt, ...) {
         fmt++;
     }
 
-    crit_exit();
+    //crit_exit();
 }
 
 void kpanic(const char* string) {
@@ -126,7 +126,7 @@ void crit_enter(void) {
 }
 
 void crit_exit(void) {
-    set_eflags(eflags);
+     set_eflags(eflags);
 }
 
 int core_init(void) {

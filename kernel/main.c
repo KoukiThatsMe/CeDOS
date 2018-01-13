@@ -51,17 +51,15 @@ extern uint8_t* IDT;
 
 void task1(void) {
     //outb(0xFE, 0x64);
-    printk("Somebody once told me\n");
+    while (1) { printk("Somebody once told me\n"); hlt(); }
 }
 
 void task2(void) {
-    printk("The world is gonna roll me\n");
+    while (1) { printk("The world is gonna roll me\n"); hlt(); }
 }
 
 void task3(void) {
-    printk("I ain't the sharpest tool in the shed.\n");
-    cli();
-    while (1);
+    while (1) { printk("I ain't the sharpest tool in the shed.\n"); hlt(); }
 }
 
 int os_main(void) {
