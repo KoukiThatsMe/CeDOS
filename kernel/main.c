@@ -2,7 +2,7 @@
 #include "cedos/interrupts.h"
 #include "cedos/pic.h"
 #include "cedos/pit.h"
-#include "cedos/scheduler.h"
+#include "cedos/sched.h"
 #include "cedos/mm/paging.h"
 #include "cedos/core.h"
 #include "assert.h"
@@ -23,7 +23,11 @@ int os_init(void) {
     interrupts_init();
     printk("done.\n");
 
-    printk("Setting up timer interrupts...");
+    printk("Setting up paging...");
+    paging_init();
+    printk("done.\n");
+
+    printk("Activating interrupts...");
     sti();
     printk("done.\n");
 
@@ -45,11 +49,32 @@ void infodump(void) {
 
 extern uint8_t* IDT;
 
+void task1(void) {
+    //outb(0xFE, 0x64);
+    printk("Somebody once told me\n");
+}
+
+void task2(void) {
+    printk("The world is gonna roll me\n");
+}
+
+void task3(void) {
+    printk("I ain't the sharpest tool in the shed.\n");
+    cli();
+    while (1);
+}
+
 int os_main(void) {
     //pic_unmask_interrupt(0);
     infodump();
 
-    printk("Starting scheduler.");
+    // create test tasks
+    printk("Creating tasks.\n");
+    sched_exec(create_empty_page_dir(), task1, eflags(), 0xC0280000);
+    sched_exec(create_empty_page_dir(), task2, eflags(), 0xC0300000);
+    sched_exec(create_empty_page_dir(), task3, eflags(), 0xC0380000);
+
+    printk("Starting scheduler.\n");
     sched_start();
 
     //kpanic("SIMULATED KERNEL PANIC");

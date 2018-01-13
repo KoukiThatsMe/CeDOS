@@ -65,14 +65,14 @@ __attribute__((always_inline)) inline void popf(void) {
  * Pushes the contents of the general purpose registers onto the stack.
  */
 __attribute__((always_inline)) inline void pusha(void) {
-    __asm__ volatile ("pusha");
+    __asm__ volatile ("pusha" : : : "eax", "ebx", "ecx", "edx", "esi", "edi");
 }
 
 /*!
  * Pops the contents of the general purpose registers off the top of the stack.
  */
 __attribute__((always_inline)) inline void popa(void) {
-    __asm__ volatile ("popa");
+    __asm__ volatile ("popa" : : : "eax", "ebx", "ecx", "edx", "esi", "edi");
 }
 
 /*!
@@ -86,6 +86,41 @@ __attribute__((always_inline)) inline void cpuid(uint32_t eax, uint32_t *ebx, ui
                         "mov %%edx, %2"
                         : "=m" (*ebx), "=m" (*ecx), "=m" (*edx)
                         : "Nd" (eax));
+}
+
+/*!
+ * Used to find out the current value of the flags register.
+ * \return Value of the EFLAGS-register.
+ */
+__attribute((always_inline)) inline uint32_t eflags() {
+    uint32_t eflags;
+    __asm__ volatile ("pushf; pop %%eax; mov %%eax, %0" : "=m" (eflags) : : "eax");
+    return eflags;
+}
+
+/*!
+ * Waits for the next interrupt.
+ */
+__attribute__((always_inline)) inline void hlt(void) {
+    __asm__ volatile ("hlt");
+}
+
+/*!
+ * Disables interrupts and returns the current EFLAGS-value.
+ * \return Current value of the EFLAGS-register.
+ */
+__attribute__((always_inline)) inline uint32_t disable_interrupts(void) {
+    uint32_t eflags;
+    __asm__ volatile ("pushf; cli; pop %%eax; mov %%eax, %0" : "=m" (eflags) : : "eax");
+    return eflags;
+}
+
+/*!
+ * Restores a prior state of the EFLAGS-register. Used in tandem with \m disable_interrupts.
+ * \param eflags Prior state of the EFLAGS-register.
+ */
+__attribute__((always_inline)) inline void restore_interrupts(uint32_t eflags) {
+    __asm__ volatile ("mov %0, %%eax; push %%eax; popf" : : "m" (eflags) : "eax");
 }
 
 /*!

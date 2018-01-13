@@ -19,6 +19,5 @@ void pit_setup_channel(PIT_CHANNEL channel, PIT_MODE mode, uint16_t freq_div) {
 }
 
 void pit_init(void) {
-    pic_unmask_interrupt(0);
     return 1;
 }

@@ -27,7 +27,7 @@ typedef uint32_t PAGE_TABLE_ENTRY;
  * \param page_dir Address of new page directory that is supposed to be used.
  * \return Address of old page directory.
  */
-__attribute__((always_inline)) inline void* switch_page_dir(void* page_dir) {
+__attribute__((always_inline)) inline PHYS_ADDR switch_page_dir(PHYS_ADDR page_dir) {
     uint32_t res;
     __asm__ volatile (  "mov %%cr3, %0\n"
                         "mov %1, %%cr3" : 
@@ -44,6 +44,15 @@ __attribute__((always_inline)) inline void inv_all_pages(void) {
                         "mov %eax, %cr3");
 }
 
+/*!
+ * Maps the specified range of physical addresses to the specified virtual address.
+ * \param page_dir Page directory on which to map the addresses.
+ * \param dest Virtual address to which the physical address \p src is to be mapped to.
+ * \param src Physical address which is to be mapped to virtual address \p dest.
+ * \param page_count Number of pages to map.
+ * \param flags Access flags for the memory range.
+ * \return 1 on success, 0 on failure
+ */
 int map_range_to(PHYS_ADDR page_dir, VIRT_ADDR dest, PHYS_ADDR src, uint32_t page_count, uint32_t flags);
 
 /*!
@@ -51,5 +60,11 @@ int map_range_to(PHYS_ADDR page_dir, VIRT_ADDR dest, PHYS_ADDR src, uint32_t pag
  * \return Address of new page directory.
  */
 PHYS_ADDR create_empty_page_dir(void);
+
+/*!
+ * Initializes paging.
+ * \return 1 on success, 0 on failure
+ */
+int paging_init(void);
 
 #endif

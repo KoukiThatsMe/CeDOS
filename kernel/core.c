@@ -1,5 +1,6 @@
 #include "cedos/core.h"
 #include "cedos/drivers/console.h"
+#include "assembly.h"
 
 CON_DRIVER *core_con;
 
@@ -45,10 +46,10 @@ void memdump(void* start, uint32_t size) {
 }
 
 void stackdump(void) {
-    void* stack;
-    __asm__ volatile ("mov %%esp, %0" : "=a" (stack));
+    void *esp, *ebp;
+    __asm__ volatile ("mov %%esp, %0; mov %%ebp, %1" : "=m" (esp), "=m" (ebp));
     printk("STACK DUMP:\n");
-    memdump(stack, 0xC0400000 - (uint32_t)stack);
+    memdump(esp, (uint32_t)ebp - (uint32_t)esp);
 }
 
 void regdump(void) {
@@ -76,6 +77,7 @@ void regdump(void) {
 }
 
 void printk(const char* fmt, ...) {
+    uint32_t eflags = disable_interrupts();
     va_list args;
     va_start(args, fmt);
     uint32_t index = 0;
@@ -104,6 +106,8 @@ void printk(const char* fmt, ...) {
 
         fmt++;
     }
+
+    restore_interrupts(eflags);
 }
 
 void kpanic(const char* string) {

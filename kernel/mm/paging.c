@@ -2,6 +2,7 @@
 #include "cedos/mm/page_allocator.h"
 #include "linker.h"
 #include "string.h"
+#include "cedos/interrupts.h"
 
 #define MAKE_PAGE_ENTRY(addr, flags) (uint32_t)(((uint32_t)(addr) & 0xFFFFF000) | (flags))
 
@@ -53,6 +54,28 @@ __attribute__((always_inline)) inline int is_addr_available(uint32_t dir_index, 
 int map_page_to(PHYS_ADDR page_addr, uint32_t dir_index, uint32_t table_index, uint32_t flags) {
     PAGE_DIR_ENTRY* page_dir = PAGE_DIR_ALT_MAPPED_ADDR;
     PAGE_TABLE_ENTRY* page_table = PAGE_TABLE_ALT_MAPPED_ADDR(dir_index);
+    
+    int tmp = 0;
+
+    if (!is_present(page_dir[dir_index])) {
+        // acquire new page table
+        void *new_page_table = get_free_page();
+        page_dir[dir_index] = MAKE_PAGE_ENTRY(new_page_table, PAGE_TABLE_FLAGS);
+    }
+
+    if (!is_present(page_table[table_index])) {
+        // map page
+        page_table[table_index] = MAKE_PAGE_ENTRY(page_addr, flags);
+        return 1;
+    } else {
+        // didn't works
+        return 0;
+    }
+}
+
+int map_page_to_this(PHYS_ADDR page_addr, uint32_t dir_index, uint32_t table_index, uint32_t flags) {
+    PAGE_DIR_ENTRY* page_dir = PAGE_DIR_MAPPED_ADDR;
+    PAGE_TABLE_ENTRY* page_table = PAGE_TABLE_MAPPED_ADDR(dir_index);
     
     int tmp = 0;
 
@@ -128,8 +151,24 @@ PHYS_ADDR create_empty_page_dir(void) {
     
     page_dir = PAGE_DIR_ALT_MAPPED_ADDR;
     
+    // identity map first 4MB
+    page_dir[0] = PAGE_DIR_MAPPED_ADDR[0];
+
     // map kernel
     page_dir[PAGE_DIR_INDEX(0xc0000000)] = PAGE_DIR_MAPPED_ADDR[PAGE_DIR_INDEX(0xc0000000)];
 
     return page_dir_phys;
+}
+
+EXCEPTION(page_fault_isr, frame, error_code) {
+    volatile VIRT_ADDR faulty_addr;
+    __asm__ volatile ("mov %%cr2, %0" : "=a" (faulty_addr));
+    printk("PAGE FAULT: %i", faulty_addr);
+    PHYS_ADDR new_page = get_free_page();
+    map_page_to_this(new_page, PAGE_DIR_INDEX(faulty_addr), PAGE_TABLE_INDEX(faulty_addr), PAGE_TABLE_FLAGS);
+    // dump registers to stdout
+}
+
+int paging_init(void) {
+    install_interrupt(0x0e, page_fault_isr, 0x08, TRAP_GATE);
 }

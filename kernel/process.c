@@ -3,8 +3,8 @@
 #define NULL ((void*)0)
 
 PROCESS* list_head;
-PROCESS_ID current_process = 0;
-PROCESS_ID next_available = 0;
+//PROCESS* current_process;
+//PROCESS_ID next_available = 0;
 
 PROCESS* get_process(PROCESS_ID pid) {
     for (PROCESS *p = list_head; p != NULL; p = p->next) {
@@ -16,19 +16,6 @@ PROCESS* get_process(PROCESS_ID pid) {
     }
 
     return NULL;
-}
-
-PROCESS_STATE get_process_state(PROCESS_ID pid) {
-    PROCESS* p = get_process(pid);
-    if (p == NULL) {
-        return PSTATE_TERMINATED;
-    } else {
-        return p->state;
-    }
-}
-
-PROCESS_ID get_current_process(void) {
-    return current_process;
 }
 
 PROCESS_ID add_process(PROCESS* process) {
