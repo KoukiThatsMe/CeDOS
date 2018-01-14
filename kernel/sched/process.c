@@ -1,4 +1,4 @@
-#include "cedos/process.h"
+#include "cedos/sched/process.h"
 
 #define NULL ((void*)0)
 

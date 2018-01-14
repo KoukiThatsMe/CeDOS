@@ -33,6 +33,12 @@ typedef struct __PROCESS {
     //! Points to the next process struct in the list.
     struct __PROCESS *next;
 
+    //! Points to the processes first child process.
+    struct __PROCESS *child;
+
+    //! Points to one of the processes sibling processes.
+    struct __PROCESS *sibling;
+
     //! Unique number to identify the process with.
     PROCESS_ID id;
 

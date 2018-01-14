@@ -6,7 +6,8 @@
 
 #include <stdint.h>
 
-#include "cedos/process.h"
+#include "cedos/sched/process.h"
+
 #include "cedos/mm/paging.h"
 
 /*!
@@ -29,7 +30,7 @@ typedef struct {
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags);
+PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry);
 
 /*!
  * Return the ID of the current process.

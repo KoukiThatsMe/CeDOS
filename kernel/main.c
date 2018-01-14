@@ -1,10 +1,14 @@
 #include "cedos/drivers/console.h"
+
+#include "cedos/sched/sched.h"
+
+#include "cedos/mm/paging.h"
+
 #include "cedos/interrupts.h"
 #include "cedos/pic.h"
 #include "cedos/pit.h"
-#include "cedos/sched.h"
-#include "cedos/mm/paging.h"
 #include "cedos/core.h"
+
 #include "assert.h"
 
 int os_init(void) {
@@ -49,6 +53,10 @@ void infodump(void) {
 
 extern uint8_t* IDT;
 
+void task1(void);
+void task2(void);
+void task3(void);
+
 void task1(void) {
     //outb(0xFE, 0x64);
     while (1) { printk("Somebody once told me\n"); hlt(); }
@@ -68,9 +76,9 @@ int os_main(void) {
 
     // create test tasks
     printk("Creating tasks.\n");
-    sched_exec(create_empty_page_dir(), task1, get_eflags());
-    sched_exec(create_empty_page_dir(), task2, get_eflags());
-    sched_exec(create_empty_page_dir(), task3, get_eflags());
+    sched_exec(create_empty_page_dir(), task1);
+    sched_exec(create_empty_page_dir(), task2);
+    sched_exec(create_empty_page_dir(), task3);
 
     printk("Starting scheduler.\n");
     sched_start();

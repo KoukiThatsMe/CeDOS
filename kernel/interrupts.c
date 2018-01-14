@@ -1,9 +1,11 @@
-#include "cedos/interrupts.h"
 #include "cedos/drivers/console.h"
+
+#include "cedos/sched/sched.h"
+
+#include "cedos/interrupts.h"
 #include "cedos/pic.h"
 #include "cedos/core.h"
 #include "cedos/pit.h"
-#include "cedos/sched.h"
 
 #define array_sizeof(array) (sizeof(array)/sizeof(array[0]))
 #define NULL ((void*)0)

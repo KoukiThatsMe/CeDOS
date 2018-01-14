@@ -170,5 +170,5 @@ EXCEPTION(page_fault_isr, frame, error_code) {
 }
 
 int paging_init(void) {
-    install_interrupt(0x0e, page_fault_isr, 0x08, TRAP_GATE);
+    install_interrupt(0x0e, page_fault_isr, 0x08, INT_GATE);
 }

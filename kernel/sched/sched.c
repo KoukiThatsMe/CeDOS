@@ -1,16 +1,22 @@
-#include "cedos/sched.h"
-#include "cedos/process.h"
+#include "cedos/sched/sched.h"
+#include "cedos/sched/process.h"
+
 #include "cedos/mm/paging.h"
+
 #include "cedos/drivers/console.h"
+#include "cedos/drivers/speaker.h"
+
 #include "cedos/core.h"
 #include "cedos/interrupts.h"
 #include "cedos/pit.h"
 #include "cedos/pic.h"
+
 #include "assembly.h"
 #include "common.h"
-#include "cedos/drivers/speaker.h"
 
 #define KERNEL_PRIVATE_STACK (void*)(0xC0600000)
+
+#define PROCESS_STD_EFLAGS (0x00000286)
 
 PROCESS* get_slot(void) {
     static PROCESS free_slots[4];
@@ -23,7 +29,7 @@ int sched_dispatcher(void);
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags) {
+PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry) {
     crit_enter();
     PHYS_ADDR tmp_page_dir = switch_page_dir(page_dir);
     PROCESS* p = get_slot();
@@ -33,8 +39,8 @@ PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags) {
     p->eip = sched_dispatcher;
     p->ebp = KERNEL_PRIVATE_STACK;
     p->esp = KERNEL_PRIVATE_STACK - sizeof(SCHED_FRAME);
-    p->eflags = eflags;
-    p->entry = (PROCESS_MAIN*)eip;
+    p->eflags = PROCESS_STD_EFLAGS;
+    p->entry = entry;
 
     // setup stack
     SCHED_FRAME* frame = (SCHED_FRAME*)(p->esp);
@@ -42,9 +48,9 @@ PROCESS_ID sched_exec(PHYS_ADDR page_dir, VIRT_ADDR eip, uint32_t eflags) {
     frame->esi = frame->edi = 0;
     frame->ebp = p->ebp;
     frame->esp = p->esp;
+    frame->eflags = p->eflags;
     frame->eip = sched_dispatcher;
     frame->cs = 0x8;
-    frame->eflags = eflags;
 
     // TODO: add file descriptors for stdin, stdout and stderr
 
@@ -71,7 +77,7 @@ void sched_interrupt_c(SCHED_FRAME * volatile frame, uint32_t volatile ebp) {
 
     // select next process
     static int pid = 0;
-    pid = pid % 3 + 1;
+    pid = pid % 2 + 1;
     current_pid = pid;
 
     printk("\n### SCHEDULER: SWITCH TO TASK %i\n", pid);
@@ -99,7 +105,7 @@ void idle(void) {
 
 int sched_init(void) {
     // create idle process
-    sched_exec(create_empty_page_dir(), idle, get_eflags());
+    sched_exec(create_empty_page_dir(), idle);
 
     return 1;
 }
