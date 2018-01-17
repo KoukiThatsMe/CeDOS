@@ -30,65 +30,80 @@ int sched_dispatcher(void);
  * Executes a task.
  */
 PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry) {
-    crit_enter();
-    PHYS_ADDR tmp_page_dir = switch_page_dir(page_dir);
-    PROCESS* p = get_slot();
-    
     // set process context
+    PROCESS *p = get_slot();
     p->page_dir = page_dir;
     p->eip = sched_dispatcher;
     p->ebp = KERNEL_PRIVATE_STACK;
     p->esp = KERNEL_PRIVATE_STACK - sizeof(SCHED_FRAME);
     p->eflags = PROCESS_STD_EFLAGS;
     p->entry = entry;
-
-    // setup stack
-    SCHED_FRAME* frame = (SCHED_FRAME*)(p->esp);
-    frame->eax = frame->ebx = frame->ecx = frame->edx = 0;
-    frame->esi = frame->edi = 0;
-    frame->ebp = p->ebp;
-    frame->esp = p->esp;
-    frame->eflags = p->eflags;
-    frame->eip = sched_dispatcher;
-    frame->cs = 0x8;
-
-    // TODO: add file descriptors for stdin, stdout and stderr
-
     p->state = PSTATE_READY;
 
-    switch_page_dir(tmp_page_dir);
+    // setup stack
+    static SCHED_FRAME frame;
+    frame.eax = frame.ebx = frame.ecx = frame.edx = 0;
+    frame.esi = frame.edi = 0;
+    frame.ebp = p->ebp;
+    frame.esp = p->esp;
+    frame.eflags = p->eflags;
+    frame.eip = sched_dispatcher;
+    frame.cs = 0x8;
 
-    crit_exit();
-    return add_process(p);
+    // load stack
+    copy_to_pdir(&frame, sizeof(frame), p->page_dir, p->esp);
+
+    // save stack checksum
+    p->checksum = stack_check(&frame, &(&frame)[1]);
+
+    PROCESS_ID pid = add_process(p);
+    printk("Executing task %i...\n", pid);
+    return pid;
 }
 
 PROCESS_ID current_pid;
 
 void sched_interrupt_c(SCHED_FRAME * volatile frame, uint32_t volatile ebp) {
     //kpanic("SCHEDULER STACK INFO");
-    PROCESS* process = get_process(current_pid);
+    PROCESS* current = get_process(current_pid);
 
     if (current_pid != 0) {
-        process->esp = (uint32_t)frame;
-        process->ebp = ebp;
-        process->eip = frame->eip;
-        process->eflags = frame->eflags;
+        current->esp = (uint32_t)frame;
+        current->ebp = ebp;
+        current->eip = frame->eip;
+        current->eflags = frame->eflags;
+
+        // save stack checksum
+        current->checksum = stack_check(current->esp, current->ebp);
     }
 
     // select next process
     static int pid = 0;
-    pid = pid % 2 + 1;
+    pid = pid % 3 + 1;
     current_pid = pid;
 
-    printk("\n### SCHEDULER: SWITCH TO TASK %i\n", pid);
+    //printk("\n### SCHEDULER: SWITCH TO TASK %i\n", pid);
 
     // prepare to return to process
-    process = get_process(current_pid);
-    switch_page_dir(process->page_dir);
-    frame = (volatile SCHED_FRAME*)(process->esp);
-    ebp = process->ebp;
-    frame->eip = process->eip;
-    frame->eflags = process->eflags;
+    PROCESS* next = get_process(current_pid);
+    switch_page_dir(next->page_dir);
+
+    // check stack
+    if (current_pid != 0 && next->checksum != stack_check(next->esp, next->ebp)) {
+        printk("STACK DAMAGED: PROCESS %i, ESP %i, EBP %i\n", current_pid, next->esp, next->ebp);
+        memdump((void*)(next->esp), (void*)(next->ebp - next->esp));
+        kpanic("CRITICAL STACK DAMAGE");
+    }
+
+    // prepare stack
+    frame = (volatile SCHED_FRAME*)(next->esp);
+    ebp = next->ebp;
+    //frame->cs = 0x08;
+    //frame->eip = next->eip;
+    //frame->eflags = next->eflags;
+    frame->esp = next->esp;
+    frame->ebp = next->ebp;
+
 
     // reset the timer
     pit_setup_channel(PIT_CHANNEL_0, PIT_MODE_0, 0xFFFF);
@@ -103,7 +118,12 @@ void idle(void) {
     while (1) { }
 }
 
+extern void* sched_interrupt;
+
 int sched_init(void) {
+    // install scheduler interrupt
+    install_interrupt(0x20, &sched_interrupt, 0x08, INT_GATE);
+
     // create idle process
     sched_exec(create_empty_page_dir(), idle);
 
@@ -142,7 +162,7 @@ int sched_dispatcher(void) {
     PROCESS_MAIN* entry = this->entry;
 
     // enter the actual program
-    entry(0, (void*)0);
+    entry();
 
     printk("Process %i terminated.\n", current_pid);
 

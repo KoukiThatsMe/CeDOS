@@ -6,6 +6,7 @@
 #define PAGING_H
 
 #include <stdint.h>
+#include "string.h"
 
 //! Number of entries within a page table/directory.
 #define PAGE_ENTRY_COUNT (uint32_t)(1 << 10)
@@ -43,6 +44,8 @@ __attribute__((always_inline)) inline void inv_all_pages(void) {
     __asm__ volatile (  "mov %cr3, %eax\n"
                         "mov %eax, %cr3");
 }
+
+size_t copy_to_pdir(VIRT_ADDR src, size_t length, PHYS_ADDR pdir, VIRT_ADDR dest);
 
 /*!
  * Maps the specified range of physical addresses to the specified virtual address.

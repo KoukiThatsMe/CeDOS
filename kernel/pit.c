@@ -18,6 +18,6 @@ void pit_setup_channel(PIT_CHANNEL channel, PIT_MODE mode, uint16_t freq_div) {
     popf();
 }
 
-void pit_init(void) {
+int pit_init(void) {
     return 1;
 }

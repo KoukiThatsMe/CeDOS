@@ -1,10 +1,12 @@
 #include "cedos/drivers/console.h"
 
 #include "cedos/sched/sched.h"
+#include "cedos/sched/process.h"
 
 #include "cedos/mm/paging.h"
 
 #include "cedos/interrupts.h"
+#include "cedos/syscall.h"
 #include "cedos/pic.h"
 #include "cedos/pit.h"
 #include "cedos/core.h"
@@ -35,6 +37,10 @@ int os_init(void) {
     sti();
     printk("done.\n");
 
+    printk("Installing syscalls...");
+    syscall_init();
+    printk("done.\n");
+
     printk("Initializing scheduler...");
     sched_init();
     printk("done.\n");
@@ -53,21 +59,29 @@ void infodump(void) {
 
 extern uint8_t* IDT;
 
-void task1(void);
-void task2(void);
-void task3(void);
+int task1(void);
+int task2(void);
+int task3(void);
 
-void task1(void) {
+int task1(void) {
     //outb(0xFE, 0x64);
-    while (1) { printk("Somebody once told me\n"); hlt(); }
+    sched_exec(create_empty_page_dir(), task2);
+    printk("  Somebody once told me\n");
+    while (1) { hlt(); }
 }
 
-void task2(void) {
-    while (1) { printk("The world is gonna roll me\n"); hlt(); }
+int task2(void) {
+    //sched_yield();
+    syscall(0, 0, 0, 0);
+    sched_exec(create_empty_page_dir(), task3);
+    printk("  The world is gonna roll me\n");
+    
+    while (1) { hlt(); }
 }
 
-void task3(void) {
-    while (1) { printk("I ain't the sharpest tool in the shed.\n"); hlt(); }
+int task3(void) {
+    printk("  I ain't the sharpest tool in the shed.\n");
+    while (1) { hlt(); }
 }
 
 int os_main(void) {
@@ -77,8 +91,6 @@ int os_main(void) {
     // create test tasks
     printk("Creating tasks.\n");
     sched_exec(create_empty_page_dir(), task1);
-    sched_exec(create_empty_page_dir(), task2);
-    sched_exec(create_empty_page_dir(), task3);
 
     printk("Starting scheduler.\n");
     sched_start();

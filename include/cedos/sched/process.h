@@ -5,6 +5,7 @@
 #define PROCESS_H
 
 #include "cedos/mm/paging.h"
+#include "cedos/sched/stack_check.h"
 
 /*!
  * Defines all possible states for processes.
@@ -24,7 +25,7 @@ typedef uint32_t PROCESS_ID;
 /*!
  * Defines the prototype for process entry functions.
  */
-typedef int PROCESS_MAIN(int argc, char** argv);
+typedef int PROCESS_MAIN(void);
 
 /*!
  * Struct that saves context information for a process.
@@ -56,6 +57,9 @@ typedef struct __PROCESS {
 
     //! Points to the base of the process stack.
     VIRT_ADDR ebp;
+
+    //! Stack checksum
+    STACK_CHECKSUM checksum;
 
     //! Current value of the EFLAGS register.
     uint32_t eflags;
