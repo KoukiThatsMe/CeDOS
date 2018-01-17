@@ -191,7 +191,7 @@ PHYS_ADDR create_empty_page_dir(void) {
 EXCEPTION(page_fault_isr, frame, error_code) {
     volatile VIRT_ADDR faulty_addr;
     __asm__ volatile ("mov %%cr2, %0" : "=a" (faulty_addr));
-    printk("PAGE FAULT: %i\n", faulty_addr);
+    printk("PAGE FAULT: %X\n", faulty_addr);
     PHYS_ADDR new_page = get_free_page();
     map_page_to_this(new_page, PAGE_DIR_INDEX(faulty_addr), PAGE_TABLE_INDEX(faulty_addr), PAGE_TABLE_FLAGS);
     // dump registers to stdout

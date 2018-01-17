@@ -1,6 +1,5 @@
 #include "cedos/pic.h"
 #include "assembly.h"
-#include "common.h"
 
 /*!
  * Moves irqs to appropriate addresses and enables all PIC interrupts

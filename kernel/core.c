@@ -4,8 +4,10 @@
 
 CON_DRIVER *core_con;
 
+char numeric[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+char hex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
 void print_hex_char(uint8_t c) {
-    static char hex[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
     core_con->write_c(hex[c >> 4]);
     core_con->write_c(hex[c & 0x0F]);
 }
@@ -15,6 +17,35 @@ void print_uint32(uint32_t value) {
     for (int i = 0; i < 4; i++) {
         print_hex_char(mem[3-i]);
     }
+}
+
+void rek_print_uint(unsigned int value) {
+    if (value > 0) {
+        rek_print_uint(value / 10);
+        core_con->write_c(numeric[value % 10]);
+    }
+}
+
+void print_uint(unsigned int value) {
+    if (value == 0) {
+        core_con->write_c('0');
+        return;
+    }
+
+    rek_print_uint(value);
+}
+
+void print_int(int value) {
+    if (value < 0) {
+        core_con->write_c('-');
+        print_int(-value);
+        return;
+    } else if (value == 0) {
+        core_con->write_c('0');
+        return;
+    }
+
+    rek_print_uint((unsigned int)value);
 }
 
 void memdump(void* start, uint32_t size) {
@@ -77,7 +108,7 @@ void regdump(void) {
 }
 
 void printk(const char* fmt, ...) {
-    //crit_enter();
+    crit_enter();
     va_list args;
     va_start(args, fmt);
     uint32_t index = 0;
@@ -88,8 +119,14 @@ void printk(const char* fmt, ...) {
     } state = STATE_DEFAULT;
 
     while (*fmt) {
-        if (state == STATE_ARGUMENT && *fmt == 'i') {
+        if (state == STATE_ARGUMENT && *fmt == 'X') {
             print_uint32(va_arg(args, uint32_t));
+            state = STATE_DEFAULT;
+        } else if (state == STATE_ARGUMENT && *fmt == 'i') {
+            print_int(va_arg(args, int));
+            state = STATE_DEFAULT;
+        } else if (state == STATE_ARGUMENT && *fmt == 'u') {
+            print_uint(va_arg(args, unsigned int));
             state = STATE_DEFAULT;
         } else if (state == STATE_ARGUMENT && *fmt == 's') {
             const char* string = va_arg(args, const char*);
@@ -107,7 +144,7 @@ void printk(const char* fmt, ...) {
         fmt++;
     }
 
-    //crit_exit();
+    crit_exit();
 }
 
 void kpanic(const char* string) {
@@ -119,14 +156,21 @@ void kpanic(const char* string) {
     while (1) {}
 }
 
-uint32_t volatile eflags = 0;
+uint32_t eflags_stack[20];
+uint32_t eflags_stack_index = 0;
 void crit_enter(void) {
-    eflags = get_eflags();
+    eflags_stack[eflags_stack_index++] = get_eflags();
     cli();
 }
 
 void crit_exit(void) {
-     set_eflags(eflags);
+    if (eflags_stack_index > 0) {
+        set_eflags(eflags_stack[--eflags_stack_index]);
+    }
+}
+
+void hard_reset(void) {
+    outb(0xFE, 0x64);
 }
 
 int core_init(void) {

@@ -59,38 +59,74 @@ void infodump(void) {
 
 extern uint8_t* IDT;
 
-int task1(void);
-int task2(void);
-int task3(void);
+void tasktree_r(PROCESS *p, int n) {
+    if (p == NULL) { return; }
 
-int task1(void) {
-    //outb(0xFE, 0x64);
-    sched_exec(create_empty_page_dir(), task2);
-    printk("  Somebody once told me\n");
+    for (int i = 0; i < n - 1; i++) {
+        printk("|  ");
+    }
+
+    printk("|--%s\n", p->name);
+
+    for (PROCESS *child = p->child; child != NULL; child = child->next_sibling) {
+        for (int i = 0; i < n; i++) {
+            printk("|  ");
+        }
+        printk("|\n");
+        tasktree_r(child, n + 1);
+    }
+}
+
+void tasktree(PROCESS_ID pid) {
+    PROCESS *process = get_process(pid);
+    if (process != NULL) {
+        crit_enter();
+        printk("Current task tree:\n");
+        tasktree_r(process, 1);
+        crit_exit();
+    }
+}
+
+int fibonacci(void) {
+    int a = 0, b = 1;
+
+    while (1) {
+        int tmp = a + b;
+        b = a;
+        a = tmp;
+        printk("%i\n", a);
+        sched_yield();
+    }
+}
+
+int leaf(void) {
     while (1) { hlt(); }
 }
 
-int task2(void) {
-    //sched_yield();
-    syscall(0, 0, 0, 0);
-    sched_exec(create_empty_page_dir(), task3);
-    printk("  The world is gonna roll me\n");
-    
+int node(void) {
+    for (int i = 0; i < 8; i++) {
+        sched_yield();
+    }
+
+    sched_exec(create_empty_page_dir(), leaf, "leaf");
+
     while (1) { hlt(); }
 }
 
-int task3(void) {
-    printk("  I ain't the sharpest tool in the shed.\n");
-    while (1) { hlt(); }
+int sysinit(void) {
+    sched_exec(create_empty_page_dir(), fibonacci, "fibonacci");
+    sched_exec(create_empty_page_dir(), node, "node");
+    while (get_process_count() < 5) { sched_yield(); }
+    tasktree(1);
+    printk("Terminating.\n");
 }
 
 int os_main(void) {
-    //pic_unmask_interrupt(0);
     infodump();
 
     // create test tasks
     printk("Creating tasks.\n");
-    sched_exec(create_empty_page_dir(), task1);
+    sched_exec(create_empty_page_dir(), sysinit, "sysinit");
 
     printk("Starting scheduler.\n");
     sched_start();

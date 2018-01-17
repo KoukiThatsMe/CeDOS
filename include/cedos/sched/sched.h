@@ -30,13 +30,13 @@ typedef struct {
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry);
+PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry, const char *name);
 
 /*!
  * Return the ID of the current process.
  * \return ID of current process.
  */
-PROCESS_ID sched_get_current_process(void);
+PROCESS_ID get_current_process(void);
 
 /*!
  * Initializes the scheduler.
@@ -48,6 +48,12 @@ int sched_init(void);
  * \return 1 on success, 0 on failure.
  */
 int sched_start(void);
+
+/*!
+ * Stops the scheduler.
+ * \return 1 on success, 0 on failure.
+ */
+int sched_stop(void);
 
 /*!
  * Returns processing time to the scheduler prematurely and blocks the 
