@@ -140,12 +140,17 @@ int sched_init(void) {
 }
 
 void sched_yield(void) {
+    crit_enter();
     PROCESS *current = get_process(current_pid);
     if (current != NULL && current->state != PSTATE_TERMINATED) {
         current->state = PSTATE_BLOCKED;
     }
 
+    uint32_t csc = crit_stash();
     INT(0x20);
+    crit_restore(csc);
+
+    crit_exit();
 }
 
 /**

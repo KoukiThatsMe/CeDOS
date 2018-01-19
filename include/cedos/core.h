@@ -14,6 +14,8 @@ void kpanic(const char* string);
 void memdump(void* start, uint32_t size);
 void crit_enter(void);
 void crit_exit(void);
+uint32_t crit_stash(void);
+void crit_restore(uint32_t state);
 void hard_reset(void);
 
 #endif

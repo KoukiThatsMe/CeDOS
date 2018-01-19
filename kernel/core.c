@@ -159,16 +159,38 @@ void kpanic(const char* string) {
     while (1) {}
 }
 
-uint32_t eflags_stack[20];
-uint32_t eflags_stack_index = 0;
+uint32_t crit_sect_counter = 0;
+uint32_t if_state = 0;
+
 void crit_enter(void) {
-    eflags_stack[eflags_stack_index++] = get_eflags();
-    cli();
+    if (crit_sect_counter++ == 0) { 
+        if_state = get_eflags() & (1 << 9); 
+        cli(); 
+    }
 }
 
 void crit_exit(void) {
-    if (eflags_stack_index > 0) {
-        set_eflags(eflags_stack[--eflags_stack_index]);
+    if (--crit_sect_counter == 0) {
+        uint32_t eflags = get_eflags() | if_state;
+        set_eflags(eflags);
+    }
+}
+
+uint32_t crit_stash(void) {
+    uint32_t __csc = crit_sect_counter;
+    crit_sect_counter = 0;
+    if (__csc > 0) {
+        uint32_t eflags = get_eflags() | if_state;
+        set_eflags(eflags);
+    }
+    return __csc;
+}
+
+void crit_restore(uint32_t state) {
+    crit_sect_counter = state;
+    if (crit_sect_counter > 0) {
+        if_state = get_eflags() & (1 << 9); 
+        cli();
     }
 }
 
