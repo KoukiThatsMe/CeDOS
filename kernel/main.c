@@ -122,6 +122,8 @@ int node(void) {
 int sysinit(void) {
     uint8_t scancode = 0;
 
+    syscall(1, 0xCAFEBABE, 0xDEADBEEF, 0x42069420);
+
     printk("PRESS ENTER\n");
 
     while (scancode != 0x1C) {
