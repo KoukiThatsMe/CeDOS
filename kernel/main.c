@@ -1,4 +1,5 @@
 #include "cedos/drivers/console.h"
+#include "cedos/drivers/keyboard.h"
 
 #include "cedos/sched/sched.h"
 #include "cedos/sched/process.h"
@@ -44,6 +45,11 @@ int os_init(void) {
     printk("Initializing scheduler...");
     sched_init();
     printk("done.\n");
+
+    printk("Initializing keyboard...");
+    ps2_kb.init();
+    printk("done.\n");
+
 
     printk("Initialization finished.\n--------------\n");
 
@@ -114,10 +120,26 @@ int node(void) {
 }
 
 int sysinit(void) {
-    sched_exec(create_empty_page_dir(), fibonacci, "fibonacci");
-    sched_exec(create_empty_page_dir(), node, "node");
-    while (get_process_count() < 5) { sched_yield(); }
-    tasktree(1);
+    uint8_t scancode = 0;
+
+    printk("PRESS ENTER\n");
+
+    while (scancode != 0x1C) {
+        scancode = ps2_kb.read();
+        printk("%c", scancode);
+    }
+
+    printk("THANKS\n");
+    
+    while (1) {
+        printk("x");
+        hlt();
+    }
+
+    //sched_exec(create_empty_page_dir(), fibonacci, "fibonacci");
+    //sched_exec(create_empty_page_dir(), node, "node");
+    //while (get_process_count() < 5) { sched_yield(); }
+    //tasktree(1);
     printk("Terminating.\n");
 }
 

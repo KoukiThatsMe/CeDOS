@@ -16,6 +16,9 @@
 
 #define PIC_END_OF_INTERRUPT	0x20
 
+#define PIC1_IRQ(n) (PIC1_OFFSET + n)
+#define PIC2_IRQ(n) (PIC2_OFFSET + n)
+
 /*!
  * Moves irqs to appropriate addresses and enables all PIC interrupts
  * \return 1 on success, 0 on fail

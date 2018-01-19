@@ -132,6 +132,9 @@ void printk(const char* fmt, ...) {
             const char* string = va_arg(args, const char*);
             while (*string) { core_con->write_c(*string++); }
             state = STATE_DEFAULT;
+        } else if (state == STATE_ARGUMENT && *fmt == 'c') {
+            core_con->write_c(va_arg(args, int));
+            state = STATE_DEFAULT;
         } else if (state == STATE_ARGUMENT && *fmt == '%') {
             core_con->write_c('%');
             state = STATE_DEFAULT;

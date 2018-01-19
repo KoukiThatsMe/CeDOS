@@ -87,7 +87,12 @@ void sched_interrupt_c(SCHED_FRAME * volatile frame, uint32_t volatile ebp) {
     // select next process
     current_pid = next_schedule(current_pid);
 
-    //printk("%i", current_pid);
+    // unblock all blocked processes
+    for (PROCESS *p = get_first_process(); p != NULL; p = p->next) {
+        if (p->state == PSTATE_BLOCKED) {
+            p->state = PSTATE_READY;
+        }
+    }
 
     // prepare to return to process
     PROCESS* next = get_process(current_pid);
@@ -124,7 +129,7 @@ extern void* sched_interrupt;
 
 int sched_init(void) {
     // install scheduler interrupt
-    install_interrupt(0x20, &sched_interrupt, 0x08, INT_GATE);
+    install_interrupt(PIC1_IRQ(0x00), &sched_interrupt, 0x08, INT_GATE);
 
     current_pid = 0;
 
@@ -135,7 +140,11 @@ int sched_init(void) {
 }
 
 void sched_yield(void) {
-    
+    PROCESS *current = get_process(current_pid);
+    if (current != NULL && current->state != PSTATE_TERMINATED) {
+        current->state = PSTATE_BLOCKED;
+    }
+
     INT(0x20);
 }
 
