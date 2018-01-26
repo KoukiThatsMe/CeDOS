@@ -42,7 +42,9 @@ resume:
   #  - activate A20 gate
 
   # reset bootdrive
+  mov $10, %cx
 reset:
+  push %cx
   movw $reset_msg, %si
   call print
   movw $bootdrive_msg, %si
@@ -50,7 +52,11 @@ reset:
 
   movb $0x00, %ah
   int $0x13
+  pop %cx
+  jnc reset_end
+  loop reset
   jc error
+reset_end:
 
   movw $done_msg, %si
   call print
@@ -60,7 +66,9 @@ reset:
   #          because it uses absolute adresses larger than 16 bit)
   #   (NOTE2: this routine only loads 0x48 sectors of the second stage into memory
   #          and is in general pretty whacky. should be replaced with sth more serious)
+  mov $10, %cx
 load:
+  push %cx
   movw $load_msg, %si
   call print
 
@@ -74,7 +82,11 @@ load:
   movb $0x00, %dh     # head
   # dl (drive) keep as is
   int $0x13
+  pop %cx
+  jnc load_end
+  loop load
   jc error
+load_end:
 
   movw $done_msg, %si
   call print

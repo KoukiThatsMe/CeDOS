@@ -10,6 +10,8 @@
 
 #include "cedos/mm/paging.h"
 
+#define SCHED_INTERVAL (0xFFFF)
+
 /*!
  * Structure of the process stack when the scheduler is executed.
  */
@@ -30,7 +32,7 @@ typedef struct {
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry, const char *name);
+PROCESS_ID sched_exec(VIRT_ADDR code, uint32_t code_len, PROCESS_MAIN *entry, const char *name);
 
 /*!
  * Return the ID of the current process.

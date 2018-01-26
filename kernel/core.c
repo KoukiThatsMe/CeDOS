@@ -49,6 +49,7 @@ void print_int(int value) {
 }
 
 void memdump(void* start, uint32_t size) {
+    crit_enter();
     uint8_t* _start = (uint8_t*)((uint32_t)start & 0xFFFFFFF0);
     uint8_t* _end = (uint8_t*)(((uint32_t)start + size + 0xF) & 0xFFFFFFF0);
 
@@ -74,6 +75,8 @@ void memdump(void* start, uint32_t size) {
         }
         core_con->write_c('\n');
     }
+
+    crit_exit();
 }
 
 void stackdump(void) {
@@ -103,8 +106,8 @@ void regdump(void) {
                         "=m" (esp),
                         "=m" (ebp));
 
-    printk(" EAX=%i EBX=%i ECX=%i EDX=%i\n", eax, ebx, ecx, edx);
-    printk(" ESI=%i EDI=%i ESP=%i EBP=%i\n", esi, edi, esp, ebp);
+    printk(" EAX=%X EBX=%X ECX=%X EDX=%X\n", eax, ebx, ecx, edx);
+    printk(" ESI=%X EDI=%X ESP=%X EBP=%X\n", esi, edi, esp, ebp);
 }
 
 void printk(const char* fmt, ...) {
@@ -127,6 +130,9 @@ void printk(const char* fmt, ...) {
             state = STATE_DEFAULT;
         } else if (state == STATE_ARGUMENT && *fmt == 'u') {
             print_uint(va_arg(args, unsigned int));
+            state = STATE_DEFAULT;
+        } else if (state == STATE_ARGUMENT && *fmt == 'p') {
+            print_uint32(va_arg(args, uint32_t));
             state = STATE_DEFAULT;
         } else if (state == STATE_ARGUMENT && *fmt == 's') {
             const char* string = va_arg(args, const char*);

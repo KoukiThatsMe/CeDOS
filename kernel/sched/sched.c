@@ -15,10 +15,9 @@
 #include "assembly.h"
 
 #define KERNEL_PRIVATE_STACK (void*)(0xC0600000)
+#define USER_STACK (void*)(0xC0000000)
 
 #define PROCESS_STD_EFLAGS (0x00000286)
-
-#define SCHED_INTERVAL (0xFFFF)
 
 PROCESS* get_slot(void) {
     static PROCESS free_slots[8];
@@ -28,21 +27,30 @@ PROCESS* get_slot(void) {
 
 PROCESS_ID current_pid;
 
+PROCESS_ID get_current_process(void) {
+    return current_pid;
+}
+
 int sched_dispatcher(void);
 
 /*!
  * Executes a task.
  */
-PROCESS_ID sched_exec(PHYS_ADDR page_dir, PROCESS_MAIN *entry, const char *name) {
+PROCESS_ID sched_exec(VIRT_ADDR code, uint32_t code_len, PROCESS_MAIN *entry, const char *name) {
     crit_enter();
+
+    PHYS_ADDR page_dir = create_empty_page_dir();
+
+    // copy app code
+    copy_to_pdir(code, code_len, page_dir, (VIRT_ADDR)0x10000000);
 
     // set process context
     PROCESS *p = get_slot();
     p->name = name;
     p->page_dir = page_dir;
     p->eip = sched_dispatcher;
-    p->ebp = KERNEL_PRIVATE_STACK;
-    p->esp = KERNEL_PRIVATE_STACK - sizeof(SCHED_FRAME);
+    p->ebp = USER_STACK;
+    p->esp = USER_STACK - sizeof(SCHED_FRAME);
     p->eflags = PROCESS_STD_EFLAGS;
     p->entry = entry;
     p->state = PSTATE_READY;
@@ -134,7 +142,7 @@ int sched_init(void) {
     current_pid = 0;
 
     // create idle process
-    sched_exec(create_empty_page_dir(), idle, "idle");
+    sched_exec(0, 0, idle, "idle");
 
     return 1;
 }

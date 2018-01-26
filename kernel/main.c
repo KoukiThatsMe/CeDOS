@@ -12,6 +12,7 @@
 #include "cedos/pit.h"
 #include "cedos/core.h"
 
+#include "linker.h"
 #include "assert.h"
 
 int os_init(void) {
@@ -93,50 +94,33 @@ void tasktree(PROCESS_ID pid) {
     }
 }
 
-int fibonacci(void) {
-    int a = 0, b = 1;
-
-    while (1) {
-        int tmp = a + b;
-        b = a;
-        a = tmp;
-        printk("%i\n", a);
-        sched_yield();
-    }
-}
-
-int leaf(void) {
-    while (1) { hlt(); }
-}
-
-int node(void) {
-    for (int i = 0; i < 8; i++) {
-        sched_yield();
-    }
-
-    sched_exec(create_empty_page_dir(), leaf, "leaf");
-
-    while (1) { hlt(); }
-}
-
 int sysinit(void) {
     uint8_t scancode = 0;
 
-    syscall(1, 0xCAFEBABE, 0xDEADBEEF, 0x42069420);
+    memdump((VIRT_ADDR)0x10000000, 0x3000);
 
-    printk("PRESS ENTER\n");
+    //syscall(0, 0xCAFEBABE, 0xDEADBEEF, 0x42069420);
 
-    while (scancode != 0x1C) {
+    printk("PRESS ENTER:");
+
+    do {
         scancode = ps2_kb.read();
         printk("%c", scancode);
-    }
+    } while (scancode != 0x1C);
 
-    printk("THANKS\n");
+    printk("THANKS, NOW PRESS ESC TO EXIT:");
+
+    do {
+        scancode = ps2_kb.read();
+        printk("%c", scancode);
+    } while (scancode != 0x01);
+
+    syscall(1, 0, 0, 0);
     
-    while (1) {
-        printk("x");
-        hlt();
-    }
+    //while (1) {
+    //    printk("x");
+    //    hlt();
+    //}
 
     //sched_exec(create_empty_page_dir(), fibonacci, "fibonacci");
     //sched_exec(create_empty_page_dir(), node, "node");
@@ -150,7 +134,7 @@ int os_main(void) {
 
     // create test tasks
     printk("Creating tasks.\n");
-    sched_exec(create_empty_page_dir(), sysinit, "sysinit");
+    sched_exec(SS_VMA + (APP_LMA - SS_LMA), APP_SIZE, APP_VMA, "sysinit");
 
     printk("Starting scheduler.\n");
     sched_start();

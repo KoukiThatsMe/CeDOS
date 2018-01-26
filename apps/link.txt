@@ -1,0 +1,16 @@
+OUTPUT_ARCH(i386)
+OUTPUT_FORMAT(elf32-i386)
+
+MEMORY
+{
+  HEADER :   ORIGIN = 0x00000000, LENGTH = 0x10000000
+  CODE :   ORIGIN = 0x10000000, LENGTH = 0xB0000000
+}
+
+SECTIONS
+{
+  .text : AT(0x0000)
+  {
+    */start.c.o(.*)
+  } >CODE
+}

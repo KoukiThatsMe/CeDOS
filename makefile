@@ -23,6 +23,7 @@ build:
 > @mkdir $(LOCAL_BUILD) 2> /dev/null; true
 > $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C boot build
 > $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C kernel build
+> $(MAKE) GLOBAL_BUILD=$(LOCAL_BUILD) -C apps build
 > $(GCC_PREFIX)ld $(LOCAL_BUILD)/*.o -T link.txt -Map=$(DEBUG_DIR)/mapfile.txt -o $(GLOBAL_BUILD)/base.o
 > $(GCC_PREFIX)objcopy --only-keep-debug $(GLOBAL_BUILD)/base.o $(DEBUG_DIR)/base.sym
 > $(GCC_PREFIX)objcopy -O binary $(GLOBAL_BUILD)/base.o $(GLOBAL_BUILD)/base.img

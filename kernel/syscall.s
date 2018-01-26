@@ -11,7 +11,7 @@ syscall_interrupt:
   mov $SYSCALL_TABLE, %ecx
   mov (%ecx, %eax, 4), %eax
 
-  call %eax
+  call *%eax
 
   // restore stack
   add $12, %esp
