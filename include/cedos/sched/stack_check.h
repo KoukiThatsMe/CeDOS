@@ -5,6 +5,7 @@
 
 typedef uint32_t STACK_CHECKSUM;
 
-STACK_CHECKSUM stack_check(const void *esp, const void *ebp);
+void stack_compute_checksum(STACK_CHECKSUM* checksum, const void *esp, const void *ebp);
+int stack_compare_checksum(STACK_CHECKSUM* a, STACK_CHECKSUM* b);
 
 #endif

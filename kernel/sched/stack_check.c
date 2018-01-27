@@ -1,11 +1,13 @@
 #include "cedos/sched/stack_check.h"
 
-STACK_CHECKSUM stack_check(const void *esp, const void *ebp) {
-    STACK_CHECKSUM sum = 0;
+void stack_compute_checksum(STACK_CHECKSUM* checksum, const void *esp, const void *ebp) {
+    *checksum = 0;
     
     for (uint32_t *p = esp; p < ebp; p = &p[1]) {
-        sum ^= *p;
+        *checksum ^= *p;
     }
+}
 
-    return sum;
+int stack_compare_checksum(STACK_CHECKSUM* a, STACK_CHECKSUM* b) {
+    return (a == b);
 }

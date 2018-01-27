@@ -12,5 +12,6 @@ SECTIONS
   .text : AT(0x0000)
   {
     */start.c.o(.*)
+    *.*(.*)
   } >CODE
 }

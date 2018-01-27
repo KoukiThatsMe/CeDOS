@@ -3,7 +3,7 @@
 #include "cedos/sched/sched.h"
 
 void test(uint32_t ebx, uint32_t ecx, uint32_t edx) {
-    printk("SYSCALL 0x01: EBX=%X ECX=%X EDX=%X\n", ebx, ecx, edx);
+    printk("SYSCALL 0x01: EBX=%i ECX=%X EDX=%X\n", ebx, ecx, edx);
 }
 
 void* SYSCALL_TABLE[] = { 

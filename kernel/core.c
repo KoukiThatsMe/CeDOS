@@ -200,6 +200,12 @@ void crit_restore(uint32_t state) {
     }
 }
 
+void crit_reset(void) {
+    crit_sect_counter = 0;
+    uint32_t eflags = get_eflags() | if_state;
+    set_eflags(eflags);
+}
+
 void hard_reset(void) {
     outb(0xFE, 0x64);
 }

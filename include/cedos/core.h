@@ -16,6 +16,7 @@ void crit_enter(void);
 void crit_exit(void);
 uint32_t crit_stash(void);
 void crit_restore(uint32_t state);
+void crit_reset(void);
 void hard_reset(void);
 
 #endif

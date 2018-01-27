@@ -69,7 +69,7 @@ PROCESS_ID sched_exec(VIRT_ADDR code, uint32_t code_len, PROCESS_MAIN *entry, co
     copy_to_pdir(&frame, sizeof(frame), p->page_dir, p->esp);
 
     // save stack checksum
-    p->checksum = stack_check(&frame, &(&frame)[1]);
+    stack_compute_checksum(&(p->checksum), &frame, &(&frame)[1]);
 
     PROCESS_ID pid = add_process(p, current_pid);
     //printk("Executing task %i...\n", pid);
@@ -89,7 +89,7 @@ void sched_interrupt_c(SCHED_FRAME * volatile frame, uint32_t volatile ebp) {
         current->eflags = frame->eflags;
 
         // save stack checksum
-        current->checksum = stack_check(current->esp, current->ebp);
+        stack_compute_checksum(&(current->checksum), current->esp, current->ebp);
     }
 
     // select next process
@@ -106,8 +106,11 @@ void sched_interrupt_c(SCHED_FRAME * volatile frame, uint32_t volatile ebp) {
     PROCESS* next = get_process(current_pid);
     switch_page_dir(next->page_dir);
 
+    STACK_CHECKSUM checksum;
+    stack_compute_checksum(&(checksum), next->esp, next->ebp);
+
     // check stack
-    if (current_pid != 0 && next->checksum != stack_check(next->esp, next->ebp)) {
+    if (stack_compare_checksum(&(next->checksum), &(checksum))) {
         printk("STACK DAMAGED: PROCESS %i (%s), ESP %X, EBP %X\n", current_pid, get_process(current_pid)->name, next->esp, next->ebp);
         memdump((void*)(next->esp), (void*)(next->ebp - next->esp));
         kpanic("CRITICAL STACK DAMAGE");
@@ -161,11 +164,6 @@ void sched_yield(void) {
     crit_exit();
 }
 
-/**
- * IMPORTANT NOTE:
- * This method has to be modified for processes to be able to kill themselves!
- * Right now, this will lead to undefined behaviour!
- */
 int sched_kill(PROCESS_ID pid) {
     int success = 1;
     crit_enter();
@@ -180,6 +178,12 @@ int sched_kill(PROCESS_ID pid) {
         remove_process(process->id);
     } else {
         success = 0;
+    }
+
+    if (get_process(current_pid) == NULL) {
+        // current process has terminated
+        crit_reset();
+        sched_yield();
     }
 
 
